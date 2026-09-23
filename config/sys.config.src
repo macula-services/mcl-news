@@ -71,5 +71,13 @@
     {macula, [
         {crypto_profile, pq_hybrid}
     ]},
+    {mcl_news, [
+        %% The realm NAME the fact topic carries. Checked at start: sha256 of it
+        %% must equal MCL_REALM. The sensor's own tuning (MCL_NEWS_FEEDS,
+        %% MCL_NEWS_POLL_MS, MCL_NEWS_SEED_COUNT, MCL_NEWS_MAX_SEEN) is read from
+        %% the environment in code, falling back to the .app.src defaults, so an
+        %% unset one is never a malformed term here.
+        {realm_name, "${MCL_REALM_NAME}"}
+    ]},
     {kernel, [{logger_level, info}]}
 ].

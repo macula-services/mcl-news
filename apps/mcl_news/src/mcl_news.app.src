@@ -7,10 +7,39 @@
         kernel,
         stdlib,
         crypto,
+        %% HTTP client, TLS and XML parsing for fetching and reading feeds.
+        inets,
+        ssl,
+        public_key,
+        xmerl,
         %% Mesh SDK, realm identity, capabilities, health.
         mcl_om
     ]},
-    {env, []},
+    {env, [
+        %% Sovereign-first default sources: EU public broadcasters and open
+        %% RSS/Atom. Each is #{name, url, lang, country, type}: country is the
+        %% ISO-2 reporting country, type is broadcaster | wire | private.
+        %% Replace wholesale with MCL_NEWS_FEEDS ("name|url|lang|country|type,...").
+        {sources, [
+            #{name => <<"france24">>,
+              url  => <<"https://www.france24.com/en/rss">>,
+              lang => <<"en">>, country => <<"fr">>, type => <<"broadcaster">>},
+            #{name => <<"vrtnws">>,
+              url  => <<"https://www.vrt.be/vrtnws/nl.rss.articles.xml">>,
+              lang => <<"nl">>, country => <<"be">>, type => <<"broadcaster">>},
+            #{name => <<"dw">>,
+              url  => <<"https://rss.dw.com/rdf/rss-en-all">>,
+              lang => <<"en">>, country => <<"de">>, type => <<"broadcaster">>}
+        ]},
+        %% How often every source is polled, in ms. MCL_NEWS_POLL_MS overrides.
+        {poll_ms, 300000},
+        %% Newest-N per source reported on the FIRST poll; the rest of the
+        %% backlog is marked seen, not reported. MCL_NEWS_SEED_COUNT overrides.
+        {seed_count, 1},
+        %% How many recent item ids are remembered, so a poll does not report
+        %% old news again. MCL_NEWS_MAX_SEEN overrides.
+        {max_seen, 4000}
+    ]},
     {modules, []},
     {licenses, ["Apache-2.0"]},
     {links, [{"GitHub", "https://github.com/macula-services/mcl-news"}]}

@@ -5,12 +5,11 @@
 %% watching. The `-behaviour' attribute below is what turns that into a compile
 %% error instead, and the generated test suite guards the attribute itself.
 %%
-%% IT ANNOUNCES NOTHING AND ASKS FOR NOTHING, on purpose. A service that does
-%% nothing yet has no capability to offer and needs no authority from the realm.
-%% Advertising a capability before it exists puts a lie on the mesh that another
-%% service can find and call. Both lists grow when the thing they name exists,
-%% and a generated test fails when they change, so growing them is a deliberate
-%% act rather than a comment someone forgot.
+%% A SENSOR, NOT A SERVER. It polls public news sources and reports each new
+%% item as a fact (mcl_news_facts). It offers no procedure, so it announces no
+%% capability, and like mcl-warden it publishes under its own verified identity,
+%% so it asks the realm for no extra authority. It holds no store: its only
+%% memory is a bounded set of item ids already reported, rebuilt on restart.
 -module(mcl_news_service).
 
 -behaviour(mcl_om_service).
@@ -22,17 +21,20 @@ info() ->
       version => <<"0.1.0">>,
       description => <<"Sovereign news sensor: polls public RSS/Atom sources and reports each new item as a mesh fact">>}.
 
-start(_Opts) -> mcl_news_sup:start_link().
+%% The realm name the topic carries is checked against the realm the pool
+%% publishes in before the sensor starts.
+start(_Opts) ->
+    ok = mcl_news_facts:check_realm_name(),
+    mcl_news_sup:start_link().
 
 stop(_State) -> ok.
 
-%% Green once the supervision tree is up. Replace this with a real probe of
-%% whatever this service needs in order to do its job. A dark mesh is usually NOT
-%% a health failure: decide that deliberately rather than by default.
+%% Green once the sensor runs. A source being down is not a health failure (the
+%% sensor keeps polling the rest), and neither is a dark mesh (facts are dropped
+%% until it returns), both deliberately.
 health() -> ok.
 
-%% WHAT THIS SERVICE ANNOUNCES IT CAN DO. Other services find this one by these
-%% names, so each entry is a promise that something answers.
+%% A sensor offers no procedure: it reports facts, and consumers subscribe.
 capabilities() -> [].
 
 %% THE AUTHORITY THIS SERVICE ASKS THE REALM FOR, and deliberately nothing more.

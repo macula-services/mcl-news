@@ -7,6 +7,7 @@
 #     MCL_REALM_KEY=<hex of the realm's public signing key> \
 #     MACULA_STATION_SEEDS=station.example:4433 \
 #     MACULA_STATION_NODE_IDS=<64-hex node id of that station> \
+#     MCL_REALM_NAME=<realm name, sha256 of which is MCL_REALM> \
 #     docker compose -p mcl-news -f deploy/docker-compose.yml up -d
 #
 # IF YOU DEPLOY THROUGH SOMETHING ELSE, keep this file anyway and let the other
@@ -53,6 +54,15 @@ services:
       # that dial could never connect anyway.
       - MACULA_STATION_SEEDS=${MACULA_STATION_SEEDS:?set MACULA_STATION_SEEDS to "host[:port][,host[:port]...]"}
       - MACULA_STATION_NODE_IDS=${MACULA_STATION_NODE_IDS:?set MACULA_STATION_NODE_IDS to the matching 64-hex node ids, comma-separated}
+      # The realm NAME the fact topic carries; sha256 of it must be MCL_REALM,
+      # or the node refuses to start rather than report where nobody listens.
+      - MCL_REALM_NAME=${MCL_REALM_NAME:?set MCL_REALM_NAME to the realm name, e.g. io.macula}
+      # Sources, "name|url|lang|country|type,..."; empty keeps the built-in
+      # sovereign-first defaults.
+      - MCL_NEWS_FEEDS=${MCL_NEWS_FEEDS:-}
+      - MCL_NEWS_POLL_MS=${MCL_NEWS_POLL_MS:-300000}
+      - MCL_NEWS_SEED_COUNT=${MCL_NEWS_SEED_COUNT:-1}
+      - MCL_NEWS_MAX_SEEN=${MCL_NEWS_MAX_SEEN:-4000}
       - MCL_NODE_NAME=mcl_news
       - MCL_NODE_HOST=127.0.0.1
       - MCL_COOKIE=mcl_news

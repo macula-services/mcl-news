@@ -58,10 +58,10 @@ info_version_matches_the_application_test() ->
 health_is_green_test() ->
     ?assertEqual(ok, ?SERVICE:health()).
 
-%% An empty list is the correct answer for a service that does nothing yet. The
-%% assertion is here so that adding a capability breaks a test and makes someone
-%% write down what the service can now actually do.
-announces_no_capability_yet_test() ->
+%% A sensor offers no procedure: it reports facts, and a consumer subscribes to
+%% them. An empty list is the honest answer, and adding a capability breaks
+%% this test so someone writes down what the service can now be called for.
+announces_no_capability_test() ->
     ?assertEqual([], ?SERVICE:capabilities()).
 
 identity_spec_has_the_shape_mcl_om_expects_test() ->
@@ -81,15 +81,29 @@ authority_matches_what_is_announced_test() ->
     ?assertEqual([], Actions),
     ?assertEqual([], Resources).
 
-%% The supervisor starts and stops cleanly on its own, without mcl_om. It has
-%% no children as generated; this asserts the tree is startable, not that it does
-%% any work.
-supervisor_starts_and_stops_test() ->
-    {ok, Pid} = mcl_news_sup:start_link(),
-    ?assert(is_process_alive(Pid)),
-    ?assertEqual([], supervisor:which_children(Pid)),
-    unlink(Pid),
-    exit(Pid, shutdown).
+%% One child, the feed sensor, which owns its poll loop and dedupe window.
+supervises_the_feed_sensor_test() ->
+    {ok, {_Flags, Children}} = mcl_news_sup:init([]),
+    ?assertEqual([sense_news_feeds], [maps:get(id, C) || C <- Children]).
+
+%% The release takes the realm name from the environment: the fact topic
+%% carries it, and start/1 checks it against the realm tag.
+release_config_names_the_realm_test() ->
+    {ok, Text} = file:read_file(alongside("config/sys.config.src")),
+    Named = re:replace(Text, <<"\"\\$\\{([A-Z_]+)\\}\"">>, <<"\"\\1\"">>, [global]),
+    Substituted = re:replace(Named, <<"\\$\\{[A-Z_]+\\}">>, <<"0">>, [global, {return, list}]),
+    {ok, Tokens, _End} = erl_scan:string(Substituted),
+    {ok, Config} = erl_parse:parse_term(Tokens),
+    ?assertEqual("MCL_REALM_NAME", proplists:get_value(realm_name, proplists:get_value(?APP, Config, []))).
+
+%% The default sources are sovereign-first and each names what the enrichment
+%% needs: a URL, a language, a reporting country and a source type.
+default_sources_are_complete_test() ->
+    _ = application:load(?APP),
+    {ok, Sources} = application:get_env(?APP, sources),
+    ?assert(length(Sources) >= 1),
+    [?assertMatch(#{name := _, url := <<"https://", _/binary>>, lang := _,
+                    country := _, type := _}, S) || S <- Sources].
 
 %%==============================================================================
 %% The runtime is pinned in two places, and neither is the one you are running

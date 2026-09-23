@@ -1,9 +1,5 @@
-%% @doc Supervises this service's own processes.
-%%
-%% NO CHILDREN AS GENERATED, and an empty child list is the honest scaffold
-%% rather than a placeholder. There is nothing to supervise yet, and a worker
-%% that ticks and does nothing is how a codebase ends up carrying an empty
-%% heartbeat for a year.
+%% @doc Supervises the feed sensor, which owns its poll loop, its dedupe window
+%% and its publishing. One child.
 -module(mcl_news_sup).
 
 -behaviour(supervisor).
@@ -13,4 +9,6 @@
 start_link() -> supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
-    {ok, {#{strategy => one_for_one, intensity => 5, period => 10}, []}}.
+    {ok, {#{strategy => one_for_one, intensity => 5, period => 10},
+          [#{id => sense_news_feeds,
+             start => {sense_news_feeds, start_link, []}}]}}.
