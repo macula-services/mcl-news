@@ -16,6 +16,10 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   `news_item_reported_v1`.
 - The start refuses a `MCL_REALM_NAME` whose sha256 is not `MCL_REALM`.
 - `rebar3 dialyzer` in CI, with macula in the PLT.
+- Built on mcl_om 0.27, which brings no barrel_docdb and so no rocksdb: the
+  image and CI install no cmake and no rocksdb codec libraries.
+- The boot claim is labelled for the realm's operator: `MCL_SERVICE_NAME`
+  (`mcl-news`) and `MCL_BOX`, the host that deploys it.
 
 ### Changed from hecate-news
 

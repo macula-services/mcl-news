@@ -72,6 +72,8 @@ a different libc.
 | `MCL_NEWS_POLL_MS` | `300000` | How often every source is polled. |
 | `MCL_NEWS_SEED_COUNT` | `1` | Items per source reported on the first poll. |
 | `MCL_NEWS_MAX_SEEN` | `4000` | Item ids remembered, so old news is not reported again. |
+| `MCL_SERVICE_NAME` | `mcl-news` | The service label on the claim the realm's operator sees at boot. Falls back to the service's own name. |
+| `MCL_BOX` | empty | The host label on that claim: which box is asking. Set by whatever deploys the service. |
 | `MCL_HEALTH_PORT` | `8498` | Health endpoint, assigned in macula-fleet `PORTS.md`. Host networking makes a collision a silent bind failure, so take a new one from there rather than picking one. |
 | `MCL_NODE_NAME` | `mcl_news` | Erlang node name. |
 | `MCL_NODE_HOST` | `127.0.0.1` | Erlang node host. |

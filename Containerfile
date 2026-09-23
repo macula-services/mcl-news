@@ -31,13 +31,9 @@ WORKDIR /build
 # recorded glibc trap: the fetched artifact loads on the build host and fails on
 # alpine at runtime.
 #
-# openssl-dev/zstd-dev/snappy-dev/lz4-dev: mcl_om pulls in rocksdb (via
-# barrel_docdb) and khepri/ra transitively, UNCONDITIONALLY -- confirmed on a
-# storeless, producer-only service (no store_id/0 or data_dir/0 exported),
-# which still failed to build without these. Not specific to a service that
-# owns its own reckon-db store.
-RUN apk add --no-cache git curl bash build-base cmake perl linux-headers \
-        openssl-dev zstd-dev snappy-dev lz4-dev
+# No cmake and no rocksdb codec headers: since mcl_om 0.27.0 nothing brings
+# rocksdb, and this service keeps no read model of its own.
+RUN apk add --no-cache git curl bash build-base perl linux-headers openssl-dev
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
         | sh -s -- -y --default-toolchain stable --profile minimal
 ENV PATH="/root/.cargo/bin:${PATH}"
@@ -68,15 +64,11 @@ FROM docker.io/alpine:3.22
 # private by accident failed its first pull with a bare "unauthorized", which
 # names nothing and sends you looking in the wrong place.
 LABEL org.opencontainers.image.source="https://github.com/macula-services/mcl-news"
-# zstd-libs/snappy/lz4-libs: the RUNTIME shared libraries for rocksdb's
-# compression backends, compiled against in the builder stage above via
-# their -dev packages. Missing here crashes the release outright on
-# boot -- rocksdb's on_load NIF init fails with "Failed to load NIF
-# library: Error loading shared library liblz4.so.1: No such file or
-# directory" and the whole node exits, since kernel can't start.
-# Confirmed live: this stage shipped without them once already.
-RUN apk add --no-cache ncurses-libs libstdc++ libgcc openssl ca-certificates curl \
-        zstd-libs snappy lz4-libs
+# No rocksdb codec libraries: nothing in this release links rocksdb. Every
+# NIF the image carries is checked against these libraries with ldd before a
+# release ships, which is how a missing one is caught (it once took a sibling
+# service's whole node down at boot).
+RUN apk add --no-cache ncurses-libs libstdc++ libgcc openssl ca-certificates curl
 WORKDIR /app
 COPY --from=builder /build/_build/prod/rel/mcl_news ./
 
