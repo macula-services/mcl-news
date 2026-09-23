@@ -70,6 +70,12 @@ realm_name_must_hash_to_the_realm_tag_test() ->
     ?assertError({mcl_news_realm_name_mismatch, <<"x">>, Tag},
                  mcl_news_facts:check_realm_name(<<"x">>, Tag)).
 
+%% A name that hashes right but is not a valid topic segment would pass the
+%% check and then fail every report while /health stays green.
+a_realm_name_that_cannot_build_the_topic_is_refused_test() ->
+    Name = <<"IO Macula">>,
+    ?assertError(_, mcl_news_facts:check_realm_name(Name, crypto:hash(sha256, Name))).
+
 realm_name_is_required_test() ->
     _ = application:load(mcl_news),
     ok = application:set_env(mcl_news, realm_name, ""),

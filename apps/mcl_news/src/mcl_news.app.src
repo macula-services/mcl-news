@@ -1,7 +1,7 @@
 {application, mcl_news, [
     {description, "Sovereign news sensor: polls public RSS/Atom sources and reports each new item as a mesh fact"},
     {vsn, "0.1.0"},
-    {registered, [mcl_news_sup]},
+    {registered, [mcl_news_sup, sense_news_feeds]},
     {mod, {mcl_news_app, []}},
     {applications, [
         kernel,

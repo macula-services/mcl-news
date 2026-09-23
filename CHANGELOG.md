@@ -31,9 +31,24 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - No record-only `news.report_item` capability: the sensor offers no
   procedure.
 - Configuration is `MCL_NEWS_*` and `MCL_REALM_NAME`; `HECATE_SOCIETY` is gone,
-  the realm replaces the society namespace.
+  the realm replaces the society namespace. `MCL_NEWS_POLL_MS`,
+  `MCL_NEWS_SEED_COUNT` and `MCL_NEWS_MAX_SEEN` must be positive; zero or junk
+  falls back to the default.
+- An item is marked seen only once its report succeeded (the publish is
+  synchronous), so a dark mesh at boot or later delays a report instead of
+  losing it; the first poll no longer waits on the mesh.
+- Each source is primed on its own first successful fetch, so a source that
+  was down at boot seeds when it returns instead of reporting its backlog.
+- A source that answers but yields no items is logged.
+- The og:image page head is cut on a UTF-8 character boundary, so a cut
+  mid-character no longer loses the picture.
+- The sensor's seeding and dedupe have tests; a feed declaring an entity is
+  pinned as refused whole.
+- `docs/INTEGRATION.md` and `deploy/.env.example` are not carried over: they
+  described the society feed, the service certificate and mind wiring, which
+  are gone. The README and `deploy/docker-compose.yml` carry what applies.
 - `Containerfile` building an alpine image, with macula's QUIC NIF compiled from
   source rather than fetched against a foreign libc.
 - `deploy/docker-compose.yml`, the service's own run contract.
-- CI: `lint-and-test` on every push and pull request, `build-and-push` to
+- CI: `lint-and-test` on pushes to `main` and on pull requests, `build-and-push` to
   the registry: `:latest` on `main`, the semver tag alone on `v*`.

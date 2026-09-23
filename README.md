@@ -33,10 +33,12 @@ It can come back when a consumer needs it.
 **Who reported it** is the publisher macula verified on delivery, this
 sensor's own node identity. The payload carries no sender label.
 
-**The first poll seeds, it does not flood:** only the newest item per source is
-reported, and the rest of the backlog is marked seen. Item ids already reported
-are remembered in a bounded in-memory window (4000 by default), rebuilt on
-restart.
+**A source's first fetch seeds, it does not flood:** only its newest item is
+reported and the rest of its backlog is marked seen, whether that fetch is at
+boot or when a source that was down comes back. An item counts as reported only
+once its publish succeeded, so a dark mesh delays reports and loses none. Item
+ids already reported are remembered in a bounded in-memory window (4000 by
+default), rebuilt on restart.
 
 It offers no procedure and asks the realm for no extra authority. `/health` is
 green while the sensor runs; a source that is down, or a dark mesh, is not a
@@ -88,9 +90,9 @@ The image has two channels. A push to `main` publishes
 else, the rollback archive: pin a host to one to roll back. A push that changes
 only documentation builds no image (`scripts/is_image_push.sh`).
 
-The service's org, the `<org>` in every procedure it offers (`<org>/<name>`), is
-this repository's name, fixed in `config/sys.config.src`. The realm's grant names
-it; without an org mcl_om advertises nothing.
+The service's org is this repository's name, fixed in `config/sys.config.src`,
+and it is the org segment of the fact topic. The sensor offers no procedure, so
+nothing is advertised under it.
 
 Two things CI cannot do for you, both of which have bitten:
 

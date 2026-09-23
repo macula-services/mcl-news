@@ -29,7 +29,7 @@
 %%% there is nothing here worth a retry, a queue, or a log line per item.
 -module(og_image).
 
--export([fill/1, of_html/1, absolute/2]).
+-export([fill/1, of_html/1, absolute/2, clip/1]).
 
 %% og:image lives in <head>, so the first bytes are all that is needed. A
 %% publisher that ignores Range sends the whole page and we stop reading at
@@ -156,8 +156,19 @@ head_of({ok, {{_V, Code, _R}, _H, Body}}) when Code =:= 200; Code =:= 206 ->
 head_of(_AnythingElse) ->
     {error, no_page}.
 
+%% @doc The head of a page, at most HEAD_BYTES, cut on a UTF-8 character
+%% boundary: a cut mid-character makes the unicode regex raise, and the picture
+%% would be lost. Continuation bytes (10xxxxxx) are dropped back to the start of
+%% their character.
 clip(Body) when byte_size(Body) =< ?HEAD_BYTES -> Body;
-clip(Body) -> binary:part(Body, 0, ?HEAD_BYTES).
+clip(Body) -> on_boundary(binary:part(Body, 0, ?HEAD_BYTES), Body).
+
+on_boundary(<<>>, _Body) -> <<>>;
+on_boundary(Head, Body) -> boundary(binary:at(Body, byte_size(Head)), Head, Body).
+
+%% The byte after the cut starts a character, so the cut is clean.
+boundary(Next, Head, _Body) when Next band 16#C0 =/= 16#80 -> Head;
+boundary(_Continuation, Head, Body) -> on_boundary(binary:part(Head, 0, byte_size(Head) - 1), Body).
 
 %% The same posture as the feed fetch: verify against the system trust store,
 %% no Big-Tech SDK. A publisher with a bad chain simply yields no picture.

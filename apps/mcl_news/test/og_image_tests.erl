@@ -94,3 +94,14 @@ an_item_with_no_url_is_untouched_test() ->
 
 junk_in_is_junk_out_not_a_crash_test() ->
     ?assertEqual(not_a_map, og_image:fill(not_a_map)).
+
+%% The page head is cut at a byte limit. Cut mid-character, the unicode regex
+%% raised inside the catch and the picture was lost; the cut now lands on a
+%% character boundary and the meta tag before it is still found.
+a_head_cut_mid_character_still_yields_the_picture_test() ->
+    Meta = <<"<meta property=\"og:image\" content=\"https://e/x.jpg\">">>,
+    Pad = binary:copy(<<"a">>, 65536 - byte_size(Meta) - 1),
+    Page = <<Meta/binary, Pad/binary, 16#C3, 16#A9, "tail">>,
+    Head = og_image:clip(Page),
+    ?assert(is_binary(unicode:characters_to_binary(Head))),
+    ?assertEqual(<<"https://e/x.jpg">>, og_image:of_html(Head)).

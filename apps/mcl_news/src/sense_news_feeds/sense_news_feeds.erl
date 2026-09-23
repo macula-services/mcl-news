@@ -8,140 +8,159 @@
 %%% poll never re-announces old news. That set is disposable and rebuilt on
 %%% restart.
 %%%
-%%% First poll primes, it does not flood: the whole current backlog is marked
-%%% seen (only the newest few per source are published as a seed), so a fresh
-%%% boot does not report hundreds of old articles at once. Only genuinely
-%%% new items — those appearing after boot — are reported. This is the same
-%%% choice the warden's auth-log sensor makes by starting at end-of-file.
+%%% A source's first fetch primes, it does not flood: its current backlog is
+%%% marked seen and only its newest few items are reported as a seed, whether
+%%% that fetch happens at boot or when a source that was down comes back. After
+%%% that, only items not seen before are reported. An item is marked seen only
+%%% once its report succeeded, so a dark mesh delays a report and loses none.
 %%%
 %%% A source being down never stops the others: each fetch is isolated, and a
 %%% failure is logged and skipped.
 -module(sense_news_feeds).
 -behaviour(gen_server).
 
--export([start_link/0]).
+-export([start_link/0, new/1, ingest/4, seen/2, window_size/1, positive_int/2]).
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2, terminate/2]).
 
 -define(DEFAULT_POLL_MS, 300000).   %% 5 minutes
--define(DEFAULT_SEED, 1).           %% newest-N per source published on first poll
+-define(DEFAULT_SEED, 1).           %% newest-N per source reported on its first fetch
 -define(DEFAULT_MAX_SEEN, 4000).    %% bounded dedupe window
 -define(FETCH_TIMEOUT, 15000).
 -define(CONNECT_TIMEOUT, 10000).
--define(READY_RETRY_MS, 5000).   %% re-check mesh readiness before the first poll
 -define(UA, "mcl-news/0.1 (+https://github.com/macula-services/mcl-news)").
 
--record(st, {sources  = []      :: [map()],
-             poll_ms            :: pos_integer(),
-             max_seen           :: pos_integer(),
-             seen     = #{}      :: #{binary() => true},
-             order    = []       :: [binary()],   %% newest-first, for eviction
-             first    = true     :: boolean()}).
+-type state() :: #{seed := non_neg_integer(), max_seen := pos_integer(),
+                   seen := #{binary() => true}, order := [binary()],
+                   primed := #{binary() => true}}.
+-type report() :: fun((map(), map()) -> ok | {error, term()}).
+
+-export_type([state/0]).
 
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+
+%% @doc An empty dedupe state: nothing seen, no source primed.
+-spec new(#{seed := non_neg_integer(), max_seen := pos_integer()}) -> state().
+new(#{seed := Seed, max_seen := Max}) ->
+    #{seed => Seed, max_seen => Max, seen => #{}, order => [], primed => #{}}.
 
 init([]) ->
     _ = application:ensure_all_started(inets),
     _ = application:ensure_all_started(ssl),
     Sources = [S || S <- sources(), maps:get(url, S, <<>>) =/= <<>>],
-    logger:info("[news] sensor up: ~b source(s), poll ~bs",
-                [length(Sources), poll_ms() div 1000]),
+    PollMs = poll_ms(),
+    logger:info("[news] sensor up: ~b source(s), poll ~bs", [length(Sources), PollMs div 1000]),
     self() ! poll,
-    {ok, #st{sources = Sources, poll_ms = poll_ms(), max_seen = max_seen()}}.
+    {ok, #{sources => Sources, poll_ms => PollMs,
+           dedupe => new(#{seed => seed_count(), max_seen => max_seen()})}}.
 
 handle_call(_Req, _From, St) -> {reply, {error, unknown_call}, St}.
 handle_cast(_Msg, St)        -> {noreply, St}.
 
-%% The FIRST poll waits for the mesh to be ready. mcl_om connects the macula
-%% client asynchronously, so a poll fired at boot would publish into a dark mesh
-%% (a no-op) AND mark those items seen — losing the whole seed until the next
-%% cycle. Retry every few seconds until the client + realm are up, THEN seed.
-handle_info(poll, #st{first = true} = St) ->
-    first_poll(mesh_ready(), St);
-handle_info(poll, St) ->
-    St2 = poll_sources(St),
-    erlang:send_after(St#st.poll_ms, self(), poll),
-    {noreply, St2#st{first = false}};
+%% No wait for the mesh before the first poll: an item is marked seen only
+%% once its report succeeded, so a poll into a dark mesh loses nothing and the
+%% next poll reports it.
+handle_info(poll, #{sources := Sources, poll_ms := PollMs, dedupe := D} = St) ->
+    D2 = lists:foldl(fun poll_source/2, D, Sources),
+    erlang:send_after(PollMs, self(), poll),
+    {noreply, St#{dedupe := D2}};
 handle_info(_Info, St) ->
     {noreply, St}.
-
-first_poll(false, St) ->
-    erlang:send_after(?READY_RETRY_MS, self(), poll),
-    {noreply, St};
-first_poll(true, St) ->
-    St2 = poll_sources(St),
-    erlang:send_after(St#st.poll_ms, self(), poll),
-    {noreply, St2#st{first = false}}.
-
-%% The mesh is ready to carry a publish once the macula client pool and the realm
-%% are both up.
-mesh_ready() ->
-    ready(mcl_om:mesh_handles()).
-
-ready({ok, _Pool, _Realm}) -> true;
-ready({error, _NotYet}) -> false.
 
 terminate(_Reason, _St) -> ok.
 
 %% --- polling ---
 
-poll_sources(St) ->
-    lists:foldl(fun poll_source/2, St, St#st.sources).
+poll_source(Source, D) ->
+    handle_body(catch fetch(maps:get(url, Source)), Source, D).
 
-poll_source(Source, St) ->
-    handle_body(catch fetch(maps:get(url, Source)), Source, St).
+handle_body({ok, Body}, Source, D) ->
+    parsed(parse_feed:parse(Body), Source, D);
+handle_body(_Err, Source, D) ->
+    logger:notice("[news] source ~ts unreachable", [name(Source)]),
+    D.
 
-handle_body({ok, Body}, Source, St) ->
-    ingest(parse_feed:parse(Body), Source, St);
-handle_body(_Err, Source, St) ->
-    logger:notice("[news] source ~ts unreachable", [maps:get(name, Source, <<"?">>)]),
-    St.
+%% A feed that answered but parsed to nothing (an unknown encoding, a broken
+%% document) is said, not silently skipped.
+parsed([], Source, D) ->
+    logger:notice("[news] source ~ts answered but yielded no items", [name(Source)]),
+    D;
+parsed(Items, Source, D) ->
+    ingest(Items, Source, D, fun report/2).
 
-%% First pass primes the dedupe window (mark everything seen) and publishes only
-%% the newest seed-count per source, so a fresh boot does not flood consumers.
-ingest(Items, Source, #st{first = true} = St) ->
-    {Seed, _Rest} = take(seed_count(), Items),
-    St2 = lists:foldl(fun(I, A) -> publish_if_new(I, Source, A) end, St, Seed),
-    lists:foldl(fun(I, A) -> mark_seen(id(I), A) end, St2, Items);
-ingest(Items, Source, St) ->
-    lists:foldl(fun(I, A) -> publish_if_new(I, Source, A) end, St, Items).
+%% og_image:fill/1 runs here and not in `enrich_item', which is pure and total
+%% and must stay that way: this is the one step that talks to the network. It
+%% runs only for an item not yet reported, and returns the item unchanged on
+%% any failure.
+report(Item, Source) ->
+    logged(mcl_news_facts:report(enrich_item:enrich(og_image:fill(Item), Source)), Item, Source).
 
-publish_if_new(Item, Source, St) ->
+logged(ok, Item, Source) ->
+    logger:info("[news] ~ts: ~ts", [name(Source), maps:get(title, Item, <<>>)]),
+    ok;
+logged({error, _} = Error, _Item, _Source) ->
+    Error.
+
+%% @doc Report the items of one fetch of `Source' through `Report'.
+%%
+%% A source's FIRST successful fetch primes it: only its newest `seed' items
+%% are reported and the rest of its backlog is marked seen, so neither a boot
+%% nor a source that was down at boot floods consumers with old news. After
+%% that, every item not seen before is reported. An item is marked seen only
+%% when its report succeeded; one that failed is tried again next poll.
+-spec ingest([map()], map(), state(), report()) -> state().
+ingest(Items, Source, #{primed := Primed} = D, Report) ->
+    primed(maps:is_key(name(Source), Primed), Items, Source, D, Report).
+
+primed(true, Items, Source, D, Report) ->
+    lists:foldl(fun(I, A) -> report_if_new(I, Source, A, Report) end, D, Items);
+primed(false, Items, Source, #{seed := Seed, primed := Primed} = D, Report) ->
+    {Fresh, Backlog} = take(Seed, Items),
+    D2 = lists:foldl(fun(I, A) -> report_if_new(I, Source, A, Report) end, D, Fresh),
+    D3 = lists:foldl(fun(I, A) -> mark_seen(id(I), A) end, D2, Backlog),
+    D3#{primed := Primed#{name(Source) => true}}.
+
+report_if_new(Item, Source, D, Report) ->
     Id = id(Item),
-    do_publish(Id, seen(Id, St), Item, Source, St).
+    reported(Id, seen(Id, D), Item, Source, D, Report).
 
-%% No stable id -> we cannot dedupe it, so we drop it rather than risk repeating.
-do_publish(<<>>, _Seen, _Item, _Source, St) ->
-    St;
-do_publish(_Id, true, _Item, _Source, St) ->
-    St;
-do_publish(Id, false, Item, Source, St) ->
-    %% og_image:fill/1 goes here and not in `enrich_item', which is documented
-    %% pure and total and must stay that way: this is the one step that talks
-    %% to the network. It runs only for an item the feed gave no picture for,
-    %% only once per item (we are past the dedupe), and returns the item
-    %% unchanged on any failure at all.
-    ok = mcl_news_facts:report(enrich_item:enrich(og_image:fill(Item), Source)),
-    logger:info("[news] ~ts: ~ts",
-                [maps:get(name, Source, <<"?">>), maps:get(title, Item, <<>>)]),
-    mark_seen(Id, St).
+%% No stable id: it cannot be deduplicated, so it is dropped rather than risk
+%% reporting it on every poll.
+reported(<<>>, _Seen, _Item, _Source, D, _Report) ->
+    D;
+reported(_Id, true, _Item, _Source, D, _Report) ->
+    D;
+reported(Id, false, Item, Source, D, Report) ->
+    marked(Report(Item, Source), Id, D).
+
+marked(ok, Id, D) -> mark_seen(Id, D);
+marked({error, _Reason}, _Id, D) -> D.
 
 id(Item) -> maps:get(item_id, Item, <<>>).
 
+name(Source) -> maps:get(name, Source, <<"?">>).
+
 %% --- bounded dedupe window ---
 
-seen(Id, #st{seen = Seen}) -> maps:is_key(Id, Seen).
+-spec seen(binary(), state()) -> boolean().
+seen(Id, #{seen := Seen}) -> maps:is_key(Id, Seen).
 
-mark_seen(<<>>, St) ->
-    St;
-mark_seen(Id, #st{seen = Seen, order = Order} = St) ->
-    evict(St#st{seen = Seen#{Id => true}, order = [Id | Order]}).
+-spec window_size(state()) -> non_neg_integer().
+window_size(#{order := Order}) -> length(Order).
 
-evict(#st{order = Order, max_seen = Max} = St) when length(Order) =< Max ->
-    St;
-evict(#st{seen = Seen, order = Order, max_seen = Max} = St) ->
+%% Each id enters the window once, newest first; the oldest leave past max_seen.
+mark_seen(<<>>, D) ->
+    D;
+mark_seen(Id, #{seen := Seen} = D) when is_map_key(Id, Seen) ->
+    D;
+mark_seen(Id, #{seen := Seen, order := Order} = D) ->
+    evict(D#{seen := Seen#{Id => true}, order := [Id | Order]}).
+
+evict(#{order := Order, max_seen := Max} = D) when length(Order) =< Max ->
+    D;
+evict(#{seen := Seen, order := Order, max_seen := Max} = D) ->
     {Keep, Drop} = lists:split(Max, Order),
-    St#st{seen = lists:foldl(fun maps:remove/2, Seen, Drop), order = Keep}.
+    D#{seen := lists:foldl(fun maps:remove/2, Seen, Drop), order := Keep}.
 
 take(N, List) when N =< 0 -> {[], List};
 take(N, List) when length(List) =< N -> {List, []};
@@ -200,19 +219,21 @@ to_source(_Bad) ->
 
 bin(S) -> unicode:characters_to_binary(string:trim(S)).
 
-poll_ms()    -> env_int("MCL_NEWS_POLL_MS", mcl_news, poll_ms, ?DEFAULT_POLL_MS).
-seed_count() -> env_int("MCL_NEWS_SEED_COUNT", mcl_news, seed_count, ?DEFAULT_SEED).
-max_seen()   -> env_int("MCL_NEWS_MAX_SEEN", mcl_news, max_seen, ?DEFAULT_MAX_SEEN).
+poll_ms()    -> setting("MCL_NEWS_POLL_MS", poll_ms, ?DEFAULT_POLL_MS).
+seed_count() -> setting("MCL_NEWS_SEED_COUNT", seed_count, ?DEFAULT_SEED).
+max_seen()   -> setting("MCL_NEWS_MAX_SEEN", max_seen, ?DEFAULT_MAX_SEEN).
 
-env_int(EnvVar, App, Key, Default) ->
-    parse_int(os:getenv(EnvVar), application:get_env(App, Key, Default)).
+setting(EnvVar, Key, Default) ->
+    positive_int(os:getenv(EnvVar), application:get_env(mcl_news, Key, Default)).
 
-parse_int(false, Fallback) ->
+%% @doc The integer in `Value', or `Fallback' when it is unset, not an integer,
+%% or not positive: a zero poll interval is a hot loop, and a zero window
+%% reports everything on every poll.
+-spec positive_int(string() | false, pos_integer()) -> pos_integer().
+positive_int(false, Fallback) ->
     Fallback;
-parse_int("", Fallback) ->
-    Fallback;
-parse_int(S, Fallback) ->
-    to_int(string:to_integer(S), Fallback).
+positive_int(Value, Fallback) ->
+    positive(string:to_integer(Value), Fallback).
 
-to_int({I, _Rest}, _Fallback) when is_integer(I), I >= 0 -> I;
-to_int(_NotInt, Fallback)                                -> Fallback.
+positive({I, _Rest}, _Fallback) when is_integer(I), I > 0 -> I;
+positive(_NotPositive, Fallback) -> Fallback.

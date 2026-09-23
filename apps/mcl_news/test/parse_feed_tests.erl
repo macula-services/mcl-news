@@ -171,3 +171,22 @@ untyped_non_image_url_is_refused_test() ->
             "</item></channel></rss>">>,
     [Item] = parse_feed:parse(Xml),
     ?assertEqual(<<>>, maps:get(image_url, Item)).
+
+%% A feed must never make the sensor read a local file. A document that
+%% declares an entity is refused whole (xmerl's entities_not_allowed on OTP 28),
+%% so the file's content cannot become a published title.
+a_feed_declaring_an_entity_is_refused_whole_test() ->
+    Path = filename:join(os:getenv("TMPDIR", "/tmp"), "mcl_news_xxe_probe"),
+    ok = file:write_file(Path, <<"SECRET-FILE-CONTENT">>),
+    Xml = <<"<?xml version=\"1.0\"?><!DOCTYPE rss [<!ENTITY k SYSTEM \"file://",
+            (list_to_binary(Path))/binary, "\">]>"
+            "<rss><channel><item><title>&k;</title><link>https://e.org/x</link>"
+            "<guid>x</guid></item></channel></rss>">>,
+    Items = parse_feed:parse(Xml),
+    ok = file:delete(Path),
+    ?assertEqual([], Items),
+    %% The same item without the declaration parses, so the refusal is the
+    %% declaration's doing and not a broken fixture.
+    Plain = <<"<?xml version=\"1.0\"?><rss><channel><item><title>t</title>"
+              "<link>https://e.org/x</link><guid>x</guid></item></channel></rss>">>,
+    ?assertMatch([#{url := <<"https://e.org/x">>}], parse_feed:parse(Plain)).

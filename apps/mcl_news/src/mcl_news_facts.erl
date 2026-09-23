@@ -33,13 +33,13 @@
                       {reporting_country_name, <<>>}, {subject_country, <<>>},
                       {subject_country_name, <<>>}, {source_type, <<"broadcaster">>}]).
 
-%% @doc Publish one enriched item. A dark mesh drops it: the sensor keeps
-%% polling, and a refused publish is logged by mcl_om (async_log).
--spec report(map()) -> ok.
+%% @doc Publish one enriched item and answer how it went. Synchronous, so the
+%% sensor marks an item reported only once it was: a dark mesh or a refused
+%% publish answers an error, and the item is tried again on the next poll.
+-spec report(map()) -> ok | {error, term()}.
 report(Item) ->
     Fact = fact(Item, erlang:system_time(millisecond)),
-    _ = mcl_om_pubsub:publish(topic(realm_name()), Fact, #{mode => async_log}),
-    ok.
+    mcl_om_pubsub:publish(topic(realm_name()), Fact, #{mode => sync}).
 
 -spec topic(binary()) -> binary().
 topic(RealmName) ->
@@ -78,8 +78,11 @@ check_realm_name() ->
 configured(Name, {ok, Tag}) -> check_realm_name(Name, Tag);
 configured(Name, Other) -> error({mcl_news_realm_unset, Name, Other}).
 
+%% The topic is built here too: a name that hashes right but is not a valid
+%% topic segment would pass the hash and then fail every report.
 -spec check_realm_name(binary(), binary()) -> ok.
 check_realm_name(Name, Tag) ->
+    _ = topic(Name),
     matched(crypto:hash(sha256, Name) =:= Tag, Name, Tag).
 
 matched(true, _Name, _Tag) -> ok;

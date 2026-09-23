@@ -32,6 +32,12 @@ parse(Xml) when is_list(Xml) ->
 %% Keep the raw bytes and let xmerl honour the document's own <?xml encoding?>
 %% declaration (EU feeds are UTF-8, some are latin-1). Decoding here first would
 %% double-decode.
+%%
+%% ENTITY DECLARATIONS ARE REFUSED. xmerl on OTP 28 rejects a document that
+%% declares entities (`entities_not_allowed', measured on 28.4.3), so a hostile
+%% feed declaring `<!ENTITY k SYSTEM "file:///...">' yields no items rather
+%% than a local file published as a title. Never pass `allow_entities' here;
+%% parse_feed_tests pins this.
 safe_scan(Xml) ->
     try xmerl_scan:string(Xml, [{quiet, true}])
     catch _:_ -> error
