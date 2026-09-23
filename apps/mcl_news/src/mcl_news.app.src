@@ -1,0 +1,17 @@
+{application, mcl_news, [
+    {description, "Sovereign news sensor: polls public RSS/Atom sources and reports each new item as a mesh fact"},
+    {vsn, "0.1.0"},
+    {registered, [mcl_news_sup]},
+    {mod, {mcl_news_app, []}},
+    {applications, [
+        kernel,
+        stdlib,
+        crypto,
+        %% Mesh SDK, realm identity, capabilities, health.
+        mcl_om
+    ]},
+    {env, []},
+    {modules, []},
+    {licenses, ["Apache-2.0"]},
+    {links, [{"GitHub", "https://github.com/macula-services/mcl-news"}]}
+]}.
