@@ -53,9 +53,9 @@ health failure.
 
     scripts/health.sh                      # against a running node
 
-Building the image needs a Rust toolchain, because macula ships a QUIC NIF and
-the alpine build compiles it from source rather than fetching one linked against
-a different libc.
+The image builds in the team's `macula-ci-otp` image and runs on
+`macula-pq-runtime`, both pinned by dated tag and digest (the same pair every
+mcl service uses); the service tests hold the pins.
 
     podman build -t mcl-news -f Containerfile .
 

@@ -129,22 +129,44 @@ default_sources_are_complete_test() ->
 %% ⚠ TO THE PATCH, AND NOTHING FLOATS. This compared majors only, so when Docker
 %% Hub moved the floating `erlang:28-alpine' on 2026-09-22 a service generated
 %% from this template shipped OTP 28.5 and its guard stayed green. It compares
-%% the full release now: the builder's (which must also carry a digest, so a
-%% re-pushed tag cannot change what builds), lint's image and the release its
-%% toolchain step insists on, .tool-versions, and this VM.
+%% the full release now: the one the image builder's RUN step insists on, the
+%% one lint's toolchain step insists on, .tool-versions, and this VM.
 the_runtime_agrees_between_the_image_the_ci_and_this_vm_test() ->
-    Image = pinned("Containerfile",
-                   "^FROM docker\\.io/(?:hexpm/)?erlang:([0-9]+\\.[0-9]+\\.[0-9]+)"
-                   "-alpine[^@\\s]*@sha256:[0-9a-f]{64} AS builder$"),
-    CiImage = pinned(".github/workflows/lint.yml",
-                     "^\\s+image: docker\\.io/(?:hexpm/)?erlang:([0-9]+\\.[0-9]+\\.[0-9]+)"
-                     "[^@\\s]*@sha256:[0-9a-f]{64}$"),
-    CiCheck = pinned(".github/workflows/lint.yml",
-                     "\\{<<\"([0-9]+\\.[0-9]+\\.[0-9]+)\">>, true\\} -> halt\\(0\\);"),
+    %% The team images' tags name a date, not a release, so the builder and
+    %% lint each assert the release in a check step; this compares those, the
+    %% .tool-versions pin and this VM, to the patch.
+    Check = "\\{<<\"([0-9]+\\.[0-9]+\\.[0-9]+)\">>, true\\} -> halt\\(0\\);",
+    Image = pinned("Containerfile", Check),
+    CiCheck = pinned(".github/workflows/lint.yml", Check),
     Tools = pinned(".tool-versions", "^erlang ([0-9]+\\.[0-9]+\\.[0-9]+)$"),
     %% Sorted and deduplicated, so a failure prints every version rather than
     %% the first pair that happened to be compared.
-    ?assertEqual([Image], lists:usort([Image, CiImage, CiCheck, Tools, running_otp()])).
+    ?assertEqual([Image], lists:usort([Image, CiCheck, Tools, running_otp()])).
+
+%% Build, CI and runtime are the team pair, named by dated tag AND digest, so a
+%% re-pushed tag cannot change what builds or what runs.
+images_are_the_digest_pinned_team_pair_test() ->
+    Digest = ":[0-9]{8}-[0-9]{4}@sha256:[0-9a-f]{64}",
+    ?assertMatch(<<_/binary>>,
+                 pinned("Containerfile",
+                        "^FROM (ghcr\\.io/macula-io/macula-ci-otp)" ++ Digest ++ " AS builder$")),
+    ?assertMatch(<<_/binary>>,
+                 pinned("Containerfile",
+                        "^FROM (ghcr\\.io/macula-io/macula-pq-runtime)" ++ Digest ++ "$")),
+    ?assertMatch(<<_/binary>>,
+                 pinned(".github/workflows/lint.yml",
+                        "^\\s+image: (ghcr\\.io/macula-io/macula-ci-otp)" ++ Digest ++ "$")).
+
+%% The image says which commit it was built from: build-push passes the sha,
+%% the runtime stage labels the image with it, so a digest a fleet pins can be
+%% traced to its commit.
+the_image_carries_its_revision_test() ->
+    ?assertEqual(<<"REVISION">>, pinned("Containerfile", "^ARG (REVISION)=unknown$")),
+    ?assertEqual(<<"${REVISION}">>,
+                 pinned("Containerfile",
+                        "^LABEL org\\.opencontainers\\.image\\.revision=\"([^\"]+)\"$")),
+    ?assertEqual(<<"${{ github.sha }}">>,
+                 pinned(".github/workflows/build-push.yml", "^\\s+REVISION=(.+)$")).
 
 %% The full release, 28.4.3 and not 28: `otp_release' names only the major.
 running_otp() ->

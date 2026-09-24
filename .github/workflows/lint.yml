@@ -1,11 +1,6 @@
-# Structural lint and unit tests. Runs on the glibc erlang image, where macula
-# resolves a prebuilt QUIC NIF -- but macula_cbor_nif (and the crypto/ucan/did/
-# mri NIFs beside it) have no such fallback and ALWAYS build from source, so a
-# Rust toolchain is needed here too or `rebar3 compile' fails in the
-# macula_cbor_nif hook before a single test runs (its build script refuses to
-# silently skip, because a package that compiles clean and fails every caller
-# at runtime with nif_not_loaded is worse). The alpine image build forces a
-# source build for everything including macula_quic; see the Containerfile.
+# Structural lint, unit tests and dialyzer, in the same digest-pinned build
+# image the Containerfile's builder uses: OTP 28.4.3, rebar3 and Rust (macula's
+# NIFs always build from source).
 
 name: lint-and-test
 
@@ -19,37 +14,14 @@ jobs:
   check:
     runs-on: ubuntu-latest
     container:
-      # ⚠ MUST MATCH THE `Containerfile' beside it: OTP 28.4.3, pinned by tag
-      # and digest. `erlang:28' floats, and a floating lint image tests a
-      # release nobody ships. hexpm's Debian trixie build, whose OpenSSL 3.5
-      # has the ML-DSA every PQ node key needs; the step below refuses
-      # anything else.
-      image: docker.io/hexpm/erlang:28.4.3-debian-trixie-20260918@sha256:956e41bfb44cf505bb526265d594ff91a3cc9945a5d32e1e8a8fbf1521d6707f
+      # ⚠ THE SAME DIGEST-PINNED BUILD IMAGE AS THE Containerfile. Its tag names
+      # a date, not a release, so the step below refuses anything but 28.4.3.
+      # The service tests guard this pin and that check.
+      image: ghcr.io/macula-io/macula-ci-otp:20260923-1444@sha256:dd2ba6eb858a0eacedf0179300323fe5c6da46fb308d22da0ca8cfcd1f0718dc
     steps:
-      # BEFORE checkout, because the image is OTP and little else: no git (so
-      # checkout would fall back to the REST API, with no real clone and no
-      # tags), no curl, no C toolchain, no rebar3. rebar3 is pinned to a
-      # release and its sha256, the same way the images are pinned: an
-      # unpinned tool in this path is how a publish was lost once already.
-      #
-      # build-essential: the C toolchain the macula NIFs link with. No
-      # cmake and no rocksdb codec libraries: since mcl_om 0.27.0 nothing
-      # brings rocksdb, and this service keeps no read model.
-      #
-      # mcl_om's template suite runs the block between the markers in this
-      # image (scripts/is_lint_toolchain_runnable.sh), so a tool missing here
-      # fails there first.
-      - name: Install and verify the toolchain
+      - uses: actions/checkout@v4
+      - name: Verify the toolchain is the one we think it is
         run: |
-          # toolchain-begin
-          apt-get update -qq
-          apt-get install -y -qq --no-install-recommends git curl ca-certificates \
-            build-essential
-          curl -fsSL -o /usr/local/bin/rebar3 \
-            https://github.com/erlang/rebar3/releases/download/3.27.0/rebar3
-          echo "af85aab41f9fd74bdd6341ebdf6fe9c88077aab9f8eac82371583fa02f2b0bdf  /usr/local/bin/rebar3" \
-            | sha256sum -c -
-          chmod +x /usr/local/bin/rebar3
           openssl version
           rebar3 version
           erl -noshell -eval '
@@ -60,13 +32,6 @@ jobs:
                 {<<"28.4.3">>, true} -> halt(0);
                 _                    -> halt(1)
             end.'
-          # toolchain-end
-      - uses: actions/checkout@v4
-      - name: Install Rust toolchain
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-            | sh -s -- -y --default-toolchain stable --profile minimal
-          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
       - run: rebar3 lint
       - run: rebar3 eunit
       - run: rebar3 dialyzer
