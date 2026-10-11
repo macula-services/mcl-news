@@ -1,6 +1,27 @@
 # mcl-news
 
-**Sovereign news sensor: polls public RSS/Atom sources and reports each new item as a mesh fact**
+<!-- Service README template: swap the service name in the badge URLs and the
+     package link; everything else is shared. -->
+
+[![CI](https://img.shields.io/github/actions/workflow/status/macula-services/mcl-news/lint.yml?branch=main&label=CI)](https://github.com/macula-services/mcl-news/actions/workflows/lint.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![ghcr.io](https://img.shields.io/badge/ghcr.io-macula--services%2Fmcl-news-blue.svg)](https://github.com/macula-services/mcl-news/pkgs/container/mcl-news)
+[![BEAM](https://img.shields.io/badge/beam-28%2B-A90533?logo=erlang&logoColor=white)](https://www.erlang.org)
+[![GitHub Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-support-ea4aaa.svg?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/rgfaber)
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/macula-full-dark.svg">
+    <img src="assets/macula-full-light.svg" alt="Macula" width="320">
+  </picture>
+</p>
+
+<p align="center">
+  <strong>Sovereign news sensor: polls public RSS/Atom sources and reports each new item as a mesh fact</strong>
+</p>
+
+---
+
 
 Built on macula 12 and `mcl_om`.
 
