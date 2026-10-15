@@ -18,7 +18,7 @@
 
 info() ->
     #{name => <<"mcl-news">>,
-      version => <<"0.1.0">>,
+      version => <<"0.1.1">>,
       description => <<"Sovereign news sensor: polls public RSS/Atom sources and reports each new item as a mesh fact">>}.
 
 %% The realm name the topic carries is checked against the realm the pool
