@@ -5,11 +5,19 @@ All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.0] - 2026-10-15
 
 ### Changed
 
-- mcl_om `~> 0.28` with macula 12.2: the service answers `mcl-news/info`
+- The wire is named, not inherited: `mcl_om ~> 0.39` with `macula ~> 14.2`, the
+  line mcl-echo, mcl-rag, mcl-stations, mcl-graph, mcl-tube, mcl-mail and
+  mcl-citizens carry. `mcl_om ~> 0.28` was a two-part tilde and so floated to
+  whichever 0.x was newest; today that is 0.40.0 on macula 14, which is the
+  wire the fleet runs, but the next mcl_om may reach for macula 15, the
+  wire-1.0 island the live stations do not speak before 16 Oct. Named, the two
+  constraints clash at resolve time instead of moving this service onto wire
+  1.0 unnoticed.
+- mcl_om: the service answers `mcl-news/info`
   with no code of its own, which also makes it count as online on the realm's
   Providers desk, and a failed publish announcement can no longer kill it.
 - Built in `macula-ci-otp` and run on `macula-pq-runtime`, the team's image
@@ -26,7 +34,7 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   `news_item_reported_v1`.
 - The start refuses a `MCL_REALM_NAME` whose sha256 is not `MCL_REALM`.
 - `rebar3 dialyzer` in CI, with macula in the PLT.
-- Built on mcl_om 0.27, which brings no barrel_docdb and so no rocksdb: the
+- mcl_om brings no barrel_docdb and so no rocksdb: the
   image and CI install no cmake and no rocksdb codec libraries.
 - The boot claim is labelled for the realm's operator: `MCL_SERVICE_NAME`
   (`mcl-news`) and `MCL_BOX`, the host that deploys it.
@@ -65,4 +73,5 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   source rather than fetched against a foreign libc.
 - `deploy/docker-compose.yml`, the service's own run contract.
 - CI: `lint-and-test` on pushes to `main` and on pull requests, `build-and-push` to
-  the registry: `:latest` on `main`, the semver tag alone on `v*`.
+  the registry: `:main` and `:<sha>` on `main`, which nothing follows; `:<semver>`
+  on a `v*` tag, promoted to `:latest` once signed and attested.

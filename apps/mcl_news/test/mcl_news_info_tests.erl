@@ -6,9 +6,10 @@
 %% frame codec, the path a reply takes. What arrives must be text, never bytes,
 %% and name this service, its procedures and the mcl_om 0.39 / macula 14.2 pair
 %% it was built with: macula 14 is the wire the live stations speak. The floors
-%% below are the floors rebar.config declares, so the older `~> 0.28' line,
-%% which floats and would follow a later mcl_om onto macula 15, fails here
-%% rather than at a station.
+%% below are rebar.config's floors, so a resolve OLDER than the declared line
+%% fails here. They do not hold the wire: forward drift onto macula 15 passes
+%% these floors, and what refuses that is the `~> 14.2' constraint, at resolve
+%% time.
 -module(mcl_news_info_tests).
 
 -include_lib("eunit/include/eunit.hrl").

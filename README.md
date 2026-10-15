@@ -24,7 +24,7 @@
 ---
 
 
-Built on macula 12 and `mcl_om`.
+Built on macula 14 and `mcl_om`.
 
 ## What it does
 
@@ -108,11 +108,13 @@ what stops a config table in a README and the real environment drifting.
 
 ## Deployment
 
-The image has two channels. A push to `main` publishes
-`ghcr.io/macula-services/mcl-news:latest`, the deploy channel: a host that follows
-`:latest` deploys every merge. A `v*` tag publishes its own version and nothing
-else, the rollback archive: pin a host to one to roll back. A push that changes
-only documentation builds no image (`scripts/is_image_push.sh`).
+The image has two channels, and only a release moves `:latest`. A `v*` tag
+publishes its own version and then, once `attest` has signed and attested that
+digest, points `:latest` at it: that is the deploy channel, the one the dev fleet
+follows. A push to `main` publishes `:main` and `:<sha>`, the tip for trying, and
+nothing follows those, so a merge deploys nothing. The semver tags stay
+published, so a host can be pinned back to a known one to roll back. A push that
+changes only documentation builds no image (`scripts/is_image_push.sh`).
 
 The service's org is this repository's name, fixed in `config/sys.config.src`,
 and it is the org segment of the fact topic. The sensor offers no procedure, so
@@ -124,8 +126,8 @@ Two things CI cannot do for you, both of which have bitten:
    the host with a bare `unauthorized` that names nothing. Check it after the
    first build. On ghcr the `org.opencontainers.image.source` label in the
    Containerfile is what links the package to the repository.
-2. The host needs `MCL_REALM`, `MCL_REALM_NAME` and the pinned station pair
-   supplied from somewhere they are not committed.
+2. The host needs `MCL_REALM`, `MCL_REALM_NAME`, `MCL_REALM_KEY` and the pinned
+   station pair supplied from somewhere they are not committed.
 
 ## The service contract
 
