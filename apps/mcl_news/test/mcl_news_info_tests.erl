@@ -4,12 +4,12 @@
 %% Built from this service's real info/0 and its real capabilities/0 with
 %% `info' added the way mcl_om:boot/2 adds it, then sent through macula's own
 %% frame codec, the path a reply takes. What arrives must be text, never bytes,
-%% and name this service, its procedures and the mcl_om 0.39 / macula 14.2 pair
-%% it was built with: macula 14 is the wire the live stations speak. The floors
-%% below are rebar.config's floors, so a resolve OLDER than the declared line
-%% fails here. They do not hold the wire: forward drift onto macula 15 passes
-%% these floors, and what refuses that is the `~> 14.2' constraint, at resolve
-%% time.
+%% and name this service, its procedures and the mcl_om 1.0 / macula 15.6 pair
+%% it was built with: macula 15 is the wire the flag day moves every service to.
+%% The floors below are rebar.config's floors, so a resolve OLDER than the
+%% declared line fails here. They do not hold the wire: forward drift onto
+%% macula 16 passes these floors, and what refuses that is the `~> 15.6'
+%% constraint, at resolve time.
 -module(mcl_news_info_tests).
 
 -include_lib("eunit/include/eunit.hrl").
@@ -29,11 +29,11 @@ info_round_trip_test_() ->
           ?_assertEqual([{text, C} || C <- [<<(?ORG)/binary, "/info">> | Own]],
                         maps:get(capabilities, Reply)),
           ?_assertEqual([], [V || V <- lists:flatten(maps:values(Reply)), is_binary(V)]),
-          %% Floors, not exact minors: the pairing that matters is mcl_om 0.39 or
-          %% later WITH macula 14.2 or later; a later compatible release (macula
-          %% 14.10.0 is current) must not fail this.
-          ?_assert(at_least(maps:get(mcl_om_version, Reply), [0, 39])),
-          ?_assert(at_least(maps:get(macula_version, Reply), [14, 2]))]
+          %% Floors, not exact minors: the pairing that matters is mcl_om 1.0 or
+          %% later WITH macula 15.6 or later; a later compatible release must
+          %% not fail this.
+          ?_assert(at_least(maps:get(mcl_om_version, Reply), [1, 0])),
+          ?_assert(at_least(maps:get(macula_version, Reply), [15, 6]))]
      end}.
 
 %% The service must leave `info' to mcl_om: declaring its own refuses boot.
