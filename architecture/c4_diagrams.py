@@ -202,7 +202,7 @@ def components():
     d.edge("M350 510V530H700V550"); d.text("t-rel", 420, 526, "fills og:image")
     d.edge("M450 390V378H700V350"); d.text("t-rel", 500, 374, "reports each item")
     d.edge("M512 770H536"); d.text("t-rel", 524, 762, "dials", anchor="middle")
-    d.box("b-ext", 64, 900, 920, 136, "Host environment", "[read at boot; nothing here is baked into the image]",
+    d.box("b-ext", 64, 900, 920, 136, "Host environment", "[read at boot; some defaults are baked in]",
           ["MCL_REALM and MCL_REALM_NAME are required and must agree; MCL_REALM_KEY is the trust anchor; MACULA_STATION_SEEDS with",
            "MACULA_STATION_NODE_IDS is the pinned dial. MCL_NEWS_FEEDS replaces the built-in broadcaster list with your own sources.",
            "MCL_NEWS_POLL_MS, MCL_NEWS_SEED_COUNT and MCL_NEWS_MAX_SEEN tune the poll, the seed and the dedupe window.",

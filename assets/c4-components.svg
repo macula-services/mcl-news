@@ -127,7 +127,7 @@
 <text class="t-rel" x="524" y="762" text-anchor="middle">dials</text>
 <rect class="b-ext" x="64" y="900" width="920" height="136" rx="10"/>
 <text class="t-code" x="80" y="928">Host environment</text>
-<text class="t-type" x="80" y="946">[read at boot; nothing here is baked into the image]</text>
+<text class="t-type" x="80" y="946">[read at boot; some defaults are baked in]</text>
 <text class="t-desc" x="80" y="970">MCL_REALM and MCL_REALM_NAME are required and must agree; MCL_REALM_KEY is the trust anchor; MACULA_STATION_SEEDS with</text>
 <text class="t-desc" x="80" y="986">MACULA_STATION_NODE_IDS is the pinned dial. MCL_NEWS_FEEDS replaces the built-in broadcaster list with your own sources.</text>
 <text class="t-desc" x="80" y="1002">MCL_NEWS_POLL_MS, MCL_NEWS_SEED_COUNT and MCL_NEWS_MAX_SEEN tune the poll, the seed and the dedupe window.</text>
