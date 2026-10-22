@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 1170" role="img" aria-label="mcl-news components">
+<title>mcl-news components</title>
+<style>
+.t-name { font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif; font-size: 15px; font-weight: 700; }
+.t-desc { font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif; font-size: 12.5px; }
+.t-rel { font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif; font-size: 11.5px; paint-order: stroke; stroke-width: 4px; stroke-linejoin: round; }
+.t-code { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 13px; font-weight: 600; }
+.t-type { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 11.5px; }
+.t-bound { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 12px; font-weight: 600; }
+.t-leg { font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, Helvetica, Arial, sans-serif; font-size: 12px; }
+.edge { fill: none; stroke-width: 1.25; }
+.edge-later { fill: none; stroke-width: 1.25; stroke-dasharray: 5 4; }
+.bg { fill: #FFFFFF; }
+.b-sys { fill: #F5E9CC; stroke: #A56F0A; stroke-width: 2; }
+.b-per { fill: #E3EBF2; stroke: #3B5B7A; stroke-width: 1.25; }
+.b-mac { fill: #E6E4EE; stroke: #5E5A78; stroke-width: 1.25; }
+.b-ext { fill: #ECEFED; stroke: #8A9791; stroke-width: 1.25; }
+.b-cmp { fill: #FFFFFF; stroke: #8A9791; stroke-width: 1.25; }
+.b-later { fill: none; stroke: #8A9791; stroke-width: 1.25; stroke-dasharray: 5 4; }
+.bound { fill: none; stroke: #B3BDB8; stroke-width: 1; }
+.head { fill: #3B5B7A; }
+.t-name, .t-code { fill: #16201D; }
+.t-type, .t-bound, .t-leg { fill: #66736E; }
+.t-desc { fill: #34413C; }
+.t-rel { fill: #66736E; stroke: #FFFFFF; }
+.edge, .edge-later { stroke: #8A9791; }
+.arrowhead { fill: #8A9791; }
+@media (prefers-color-scheme: dark) {
+.bg { fill: #171F1C; }
+.b-sys { fill: #3A2E13; stroke: #E3AA3C; }
+.b-per { fill: #1D2A36; stroke: #8EB4D8; }
+.b-mac { fill: #26243A; stroke: #A9A4C8; }
+.b-ext { fill: #1C2421; stroke: #7D8B85; }
+.b-cmp { fill: #171F1C; stroke: #7D8B85; }
+.b-later { stroke: #7D8B85; }
+.bound { stroke: #4A5752; }
+.head { fill: #8EB4D8; }
+.t-name, .t-code { fill: #E6ECE9; }
+.t-type, .t-bound, .t-leg { fill: #93A09A; }
+.t-desc { fill: #C3CDC8; }
+.t-rel { fill: #93A09A; stroke: #171F1C; }
+.edge, .edge-later { stroke: #7D8B85; }
+.arrowhead { fill: #7D8B85; }
+}
+</style>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrowhead" d="M0 0L10 5L0 10z"/></marker></defs>
+<rect class="bg" x="0" y="0" width="1040" height="1170"/>
+<rect class="bound" x="40" y="40" width="968" height="830" rx="12"/>
+<text class="t-bound" x="56" y="62">mcl-news [Container]</text>
+<rect class="b-cmp" x="56" y="70" width="456" height="120" rx="10"/>
+<text class="t-code" x="72" y="98">mcl_news_app</text>
+<text class="t-type" x="72" y="116">[OTP application]</text>
+<text class="t-desc" x="72" y="140">start/2 calls mcl_om:boot(mcl_news_service).</text>
+<text class="t-desc" x="72" y="156">The service exports no store_id/0 or data_dir/0,</text>
+<text class="t-desc" x="72" y="172">so mcl_om starts no reckon-db and no subscription.</text>
+<rect class="b-sys" x="536" y="70" width="456" height="120" rx="10"/>
+<text class="t-code" x="552" y="98">mcl_news_service</text>
+<text class="t-type" x="552" y="116">[:mcl_om_service behaviour]</text>
+<text class="t-desc" x="552" y="140">The six callbacks. start/1 refuses a realm whose</text>
+<text class="t-desc" x="552" y="156">tag is not the sha256 of MCL_REALM_NAME;</text>
+<text class="t-desc" x="552" y="172">capabilities/0 is empty; scope mcl-news, 30 days.</text>
+<rect class="b-cmp" x="56" y="230" width="456" height="120" rx="10"/>
+<text class="t-code" x="72" y="258">mcl_news_sup</text>
+<text class="t-type" x="72" y="276">[supervisor, one_for_one]</text>
+<text class="t-desc" x="72" y="300">One child, sense_news_feeds, which owns the poll</text>
+<text class="t-desc" x="72" y="316">loop, the dedupe window and the publishing.</text>
+<text class="t-desc" x="72" y="332">A crashed sensor is restarted and re-seeds.</text>
+<rect class="b-cmp" x="536" y="230" width="456" height="120" rx="10"/>
+<text class="t-code" x="552" y="258">mcl_news_facts</text>
+<text class="t-type" x="552" y="276">[Erlang module]</text>
+<text class="t-desc" x="552" y="300">The one topic and its payload, every string</text>
+<text class="t-desc" x="552" y="316">tagged text, and report/1, which publishes</text>
+<text class="t-desc" x="552" y="332">synchronously and answers ok only once it did.</text>
+<rect class="b-cmp" x="56" y="390" width="456" height="120" rx="10"/>
+<text class="t-code" x="72" y="418">sense_news_feeds</text>
+<text class="t-type" x="72" y="436">[gen_server, the poll loop]</text>
+<text class="t-desc" x="72" y="460">Every MCL_NEWS_POLL_MS: fetch each source, drop</text>
+<text class="t-desc" x="72" y="476">what it has seen, report the rest. Holds the</text>
+<text class="t-desc" x="72" y="492">bounded dedupe window and the primed set.</text>
+<rect class="b-cmp" x="536" y="390" width="456" height="120" rx="10"/>
+<text class="t-code" x="552" y="418">parse_feed</text>
+<text class="t-type" x="552" y="436">[Erlang module, pure]</text>
+<text class="t-desc" x="552" y="460">One xpath sweep for RSS 2.0, RSS 1.0/RDF and</text>
+<text class="t-desc" x="552" y="476">Atom; the item id is a sha256 of the source's</text>
+<text class="t-desc" x="552" y="492">own guid, so the same story dedupes.</text>
+<rect class="b-cmp" x="56" y="550" width="456" height="120" rx="10"/>
+<text class="t-code" x="72" y="578">enrich_item</text>
+<text class="t-type" x="72" y="596">[Erlang module, pure]</text>
+<text class="t-desc" x="72" y="620">Topic class and emoji, reporting and subject</text>
+<text class="t-desc" x="72" y="636">country, source type; a fixed taxonomy and a</text>
+<text class="t-desc" x="72" y="652">gazetteer sweep, with a safe default for each.</text>
+<rect class="b-cmp" x="536" y="550" width="456" height="120" rx="10"/>
+<text class="t-code" x="552" y="578">og_image</text>
+<text class="t-type" x="552" y="596">[Erlang module, one network step]</text>
+<text class="t-desc" x="552" y="620">For an item with no picture, reads the</text>
+<text class="t-desc" x="552" y="636">publisher's own og:image from the article page,</text>
+<text class="t-desc" x="552" y="652">bounded and silent on failure. Never for old items.</text>
+<rect class="b-mac" x="56" y="710" width="456" height="120" rx="10"/>
+<text class="t-code" x="72" y="738">mcl_om</text>
+<text class="t-type" x="72" y="756">[library, ~&gt; 1.4]</text>
+<text class="t-desc" x="72" y="780">boot/1: loads the identity key, joins the</text>
+<text class="t-desc" x="72" y="796">realm, dials the pinned stations, serves /health</text>
+<text class="t-desc" x="72" y="812">on 8498, and carries mcl_om_pubsub:publish/3.</text>
+<rect class="b-mac" x="536" y="710" width="456" height="120" rx="10"/>
+<text class="t-code" x="552" y="738">macula SDK</text>
+<text class="t-type" x="552" y="756">[library, ~&gt; 16.0, wire 1.0]</text>
+<text class="t-desc" x="552" y="780">QUIC transport, pubsub over the stations, and</text>
+<text class="t-desc" x="552" y="796">the publisher every link verified, which is</text>
+<text class="t-desc" x="552" y="812">what a fact's attribution rests on.</text>
+<path class="edge" d="M56 130H16V770H56" marker-end="url(#a)"/>
+<text class="t-rel" x="30" y="450" text-anchor="middle" transform="rotate(-90 30 450)">calls mcl_om:boot/1</text>
+<path class="edge" d="M512 130H536" marker-end="url(#a)"/>
+<text class="t-rel" x="524" y="122" text-anchor="middle">boots</text>
+<path class="edge" d="M536 160H520V210H284V230" marker-end="url(#a)"/>
+<text class="t-rel" x="300" y="206">starts</text>
+<path class="edge" d="M200 350V390" marker-end="url(#a)"/>
+<text class="t-rel" x="208" y="374">one child</text>
+<path class="edge" d="M512 450H536" marker-end="url(#a)"/>
+<text class="t-rel" x="524" y="442" text-anchor="middle">parses</text>
+<path class="edge" d="M200 510V550" marker-end="url(#a)"/>
+<text class="t-rel" x="208" y="534">enriches each item</text>
+<path class="edge" d="M350 510V530H700V550" marker-end="url(#a)"/>
+<text class="t-rel" x="420" y="526">fills og:image</text>
+<path class="edge" d="M450 390V378H700V350" marker-end="url(#a)"/>
+<text class="t-rel" x="500" y="374">reports each item</text>
+<path class="edge" d="M512 770H536" marker-end="url(#a)"/>
+<text class="t-rel" x="524" y="762" text-anchor="middle">dials</text>
+<rect class="b-ext" x="64" y="900" width="920" height="136" rx="10"/>
+<text class="t-code" x="80" y="928">Host environment</text>
+<text class="t-type" x="80" y="946">[read at boot; nothing here is baked into the image]</text>
+<text class="t-desc" x="80" y="970">MCL_REALM and MCL_REALM_NAME are required and must agree; MCL_REALM_KEY is the trust anchor; MACULA_STATION_SEEDS with</text>
+<text class="t-desc" x="80" y="986">MACULA_STATION_NODE_IDS is the pinned dial. MCL_NEWS_FEEDS replaces the built-in broadcaster list with your own sources.</text>
+<text class="t-desc" x="80" y="1002">MCL_NEWS_POLL_MS, MCL_NEWS_SEED_COUNT and MCL_NEWS_MAX_SEEN tune the poll, the seed and the dedupe window.</text>
+<text class="t-desc" x="80" y="1018">MCL_SERVICE_NAME and MCL_BOX label the boot claim; MCL_HEALTH_PORT is 8498.</text>
+<text class="t-desc" x="64" y="1070">No store: the only memory is a bounded set of item ids already reported, rebuilt on restart. An item is marked seen only once its</text>
+<text class="t-desc" x="64" y="1088">publish succeeded, so a dark mesh delays a report and loses none. A source's first fetch seeds rather than floods: only its newest</text>
+<text class="t-desc" x="64" y="1106">item is reported, and the rest of its backlog is marked seen, at boot or when a source comes back after being down.</text>
+<rect class="b-sys" x="24" y="1130" width="22" height="14" rx="3"/>
+<text class="t-leg" x="54" y="1142">In scope</text>
+<rect class="b-per" x="110.8" y="1130" width="22" height="14" rx="3"/>
+<text class="t-leg" x="140.8" y="1142">Person</text>
+<rect class="b-mac" x="184.39999999999998" y="1130" width="22" height="14" rx="3"/>
+<text class="t-leg" x="214.39999999999998" y="1142">Macula infrastructure</text>
+<rect class="b-ext" x="357.0" y="1130" width="22" height="14" rx="3"/>
+<text class="t-leg" x="387.0" y="1142">External system</text>
+<rect class="b-cmp" x="490.0" y="1130" width="22" height="14" rx="3"/>
+<text class="t-leg" x="520.0" y="1142">Container or component</text>
+<rect class="bound" x="669.2" y="1130" width="22" height="14" rx="3"/>
+<text class="t-leg" x="699.2" y="1142">Boundary</text>
+</svg>
