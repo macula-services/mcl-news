@@ -32,8 +32,8 @@ info_round_trip_test_() ->
           %% Floors, not exact minors: the pairing that matters is mcl_om 1.0 or
           %% later WITH macula 15.6 or later; a later compatible release must
           %% not fail this.
-          ?_assert(at_least(maps:get(mcl_om_version, Reply), [1, 0])),
-          ?_assert(at_least(maps:get(macula_version, Reply), [15, 6]))]
+          ?_assert(at_least(maps:get(mcl_om_version, Reply), [1, 4])),
+          ?_assert(at_least(maps:get(macula_version, Reply), [16, 0]))]
      end}.
 
 %% The service must leave `info' to mcl_om: declaring its own refuses boot.
