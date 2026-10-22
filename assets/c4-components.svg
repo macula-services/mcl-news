@@ -53,12 +53,14 @@
 <text class="t-desc" x="72" y="140">start/2 calls mcl_om:boot(mcl_news_service).</text>
 <text class="t-desc" x="72" y="156">The service exports no store_id/0 or data_dir/0,</text>
 <text class="t-desc" x="72" y="172">so mcl_om starts no reckon-db and no subscription.</text>
-<rect class="b-sys" x="536" y="70" width="456" height="120" rx="10"/>
+<rect class="b-sys" x="536" y="70" width="456" height="152" rx="10"/>
 <text class="t-code" x="552" y="98">mcl_news_service</text>
 <text class="t-type" x="552" y="116">[:mcl_om_service behaviour]</text>
 <text class="t-desc" x="552" y="140">The six callbacks. start/1 refuses a realm whose</text>
-<text class="t-desc" x="552" y="156">tag is not the sha256 of MCL_REALM_NAME;</text>
-<text class="t-desc" x="552" y="172">capabilities/0 is empty; scope mcl-news, 30 days.</text>
+<text class="t-desc" x="552" y="156">tag is not the sha256 of MCL_REALM_NAME, and its</text>
+<text class="t-desc" x="552" y="172">scope is mcl-news for 30 days. No procedure of its</text>
+<text class="t-desc" x="552" y="188">own; mcl-om adds mcl-news/info and</text>
+<text class="t-desc" x="552" y="204">mcl-news/get_limits, both open. capabilities/0 is the list.</text>
 <rect class="b-cmp" x="56" y="230" width="456" height="120" rx="10"/>
 <text class="t-code" x="72" y="258">mcl_news_sup</text>
 <text class="t-type" x="72" y="276">[supervisor, one_for_one]</text>

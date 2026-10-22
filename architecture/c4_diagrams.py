@@ -142,7 +142,7 @@ def context():
           ["France 24, VRT NWS and DW by", "default: RSS/Atom over HTTPS,", "and the page for og:image"])
     d.box("b-sys", 365, 186, 270, 170, "mcl-news", "[mcl_om mesh service]",
           ["Polls every source every five", "minutes and reports each item it", "has not reported before as one fact,",
-           "news_item_reported_v1. /health is a", "port, 8498. No own procedures, and", "no store"])
+           "news_item_reported_v1. /health is a", "port, 8498. No procedure of its own,", "and no store"])
     d.box("b-mac", 365, 430, 270, 120, "macula-realm", "[Macula infrastructure]",
           ["The trust anchor and the grant:", "the org mcl-news, scope for 30", "days, and the boot claim"])
     d.box("b-mac", 690, 430, 270, 120, "Macula stations, mesh DHT", "[Macula infrastructure]",
@@ -153,8 +153,8 @@ def context():
     d.edge("M600 186V168H825V150"); d.text("t-rel", 640, 164, "fetches every 5 minutes")
     d.edge("M460 338V430"); d.text("t-rel", 468, 384, "trust anchor, grant")
     d.edge("M620 338V370H825V430"); d.text("t-rel", 632, 364, "publishes the fact")
-    d.text("t-desc", 40, 596, "The sensor offers no procedure of its own and asks the realm for no extra authority: its whole output is one fact, published under")
-    d.text("t-desc", 40, 614, "its own verified identity. A source's first fetch seeds rather than floods: only its newest item is reported and the")
+    d.text("t-desc", 40, 596, "The sensor asks the realm for no extra authority: its whole output is one fact, published under its own verified identity.")
+    d.text("t-desc", 40, 614, "A source's first fetch seeds rather than floods: only its newest item is reported, and the")
     d.text("t-desc", 40, 632, "rest of the backlog is marked seen. A source being down, or a dark mesh, is deliberately not a health failure.")
     d.legend(650, boundary=False)
     d.write()
@@ -166,9 +166,11 @@ def components():
     d.box("b-cmp", 56, 70, 456, 120, "mcl_news_app", "[OTP application]",
           ["start/2 calls mcl_om:boot(mcl_news_service).", "The service exports no store_id/0 or data_dir/0,",
            "so mcl_om starts no reckon-db and no subscription."], code=True)
-    d.box("b-sys", 536, 70, 456, 120, "mcl_news_service", "[:mcl_om_service behaviour]",
-          ["The six callbacks. start/1 refuses a realm whose", "tag is not the sha256 of MCL_REALM_NAME;",
-           "capabilities/0 is empty; scope mcl-news, 30 days."], code=True)
+    d.box("b-sys", 536, 70, 456, 152, "mcl_news_service", "[:mcl_om_service behaviour]",
+          ["The six callbacks. start/1 refuses a realm whose", "tag is not the sha256 of MCL_REALM_NAME, and its",
+           "scope is mcl-news for 30 days. No procedure of its",
+           "own; mcl-om adds mcl-news/info and",
+           "mcl-news/get_limits, both open. capabilities/0 is the list."], code=True)
     d.box("b-cmp", 56, 230, 456, 120, "mcl_news_sup", "[supervisor, one_for_one]",
           ["One child, sense_news_feeds, which owns the poll", "loop, the dedupe window and the publishing.",
            "A crashed sensor is restarted and re-seeds."], code=True)

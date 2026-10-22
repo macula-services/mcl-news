@@ -71,8 +71,8 @@
 <text class="t-desc" x="381" y="272">minutes and reports each item it</text>
 <text class="t-desc" x="381" y="288">has not reported before as one fact,</text>
 <text class="t-desc" x="381" y="304">news_item_reported_v1. /health is a</text>
-<text class="t-desc" x="381" y="320">port, 8498. No own procedures, and</text>
-<text class="t-desc" x="381" y="336">no store</text>
+<text class="t-desc" x="381" y="320">port, 8498. No procedure of its own,</text>
+<text class="t-desc" x="381" y="336">and no store</text>
 <rect class="b-mac" x="365" y="430" width="270" height="120" rx="10"/>
 <text class="t-name" x="381" y="458">macula-realm</text>
 <text class="t-type" x="381" y="476">[Macula infrastructure]</text>
@@ -96,8 +96,8 @@
 <text class="t-rel" x="468" y="384">trust anchor, grant</text>
 <path class="edge" d="M620 338V370H825V430" marker-end="url(#a)"/>
 <text class="t-rel" x="632" y="364">publishes the fact</text>
-<text class="t-desc" x="40" y="596">The sensor offers no procedure of its own and asks the realm for no extra authority: its whole output is one fact, published under</text>
-<text class="t-desc" x="40" y="614">its own verified identity. A source's first fetch seeds rather than floods: only its newest item is reported and the</text>
+<text class="t-desc" x="40" y="596">The sensor asks the realm for no extra authority: its whole output is one fact, published under its own verified identity.</text>
+<text class="t-desc" x="40" y="614">A source's first fetch seeds rather than floods: only its newest item is reported, and the</text>
 <text class="t-desc" x="40" y="632">rest of the backlog is marked seen. A source being down, or a dark mesh, is deliberately not a health failure.</text>
 <rect class="b-sys" x="24" y="650" width="22" height="14" rx="3"/>
 <text class="t-leg" x="54" y="662">In scope</text>

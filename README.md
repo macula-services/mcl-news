@@ -62,7 +62,7 @@ once its publish succeeded, so a dark mesh delays reports and loses none. Item
 ids already reported are remembered in a bounded in-memory window (4000 by
 default), rebuilt on restart.
 
-It offers no procedure of its own and asks the realm for no extra authority. `/health` is
+It asks the realm for no extra authority. `/health` is
 green while the sensor runs; a source that is down, or a dark mesh, is not a
 health failure.
 
@@ -108,17 +108,18 @@ what stops a config table in a README and the real environment drifting.
 
 ## Deployment
 
-The image has two channels, and only a release moves `:latest`. A `v*` tag
-publishes its own version and then, once `attest` has signed and attested that
-digest, points `:latest` at it: that is the deploy channel, the one the dev fleet
-follows. A push to `main` publishes `:main` and `:<sha>`, the tip for trying, and
-nothing follows those, so a merge deploys nothing. The semver tags stay
-published, so a host can be pinned back to a known one to roll back. A push that
-changes only documentation builds no image (`scripts/is_image_push.sh`).
+The image has two channels. A `v*` tag publishes its own version and then, once
+`attest` has signed and attested that digest, points `:latest` at it; the fleet
+runs a signed release pinned by digest, and CI commits that pin. A push to `main`
+publishes `:main` and `:<sha>`, the tip for trying, and nothing follows those, so
+a merge deploys nothing. The semver tags stay published, so a host can be pinned
+back to a known one to roll back. A push that changes only documentation builds
+no image (`scripts/is_image_push.sh`).
 
 The service's org is this repository's name, fixed in `config/sys.config.src`,
-and it is the org segment of the fact topic. The sensor offers no procedure of its own, so
-nothing is advertised under it.
+and it is the org segment of the fact topic. `mcl-news` has no procedure of its
+own; `mcl-om` adds `mcl-news/info` and `mcl-news/get_limits`, both open, and
+`capabilities/0` is the list.
 
 Two things CI cannot do for you, both of which have bitten:
 
