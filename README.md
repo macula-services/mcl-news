@@ -62,7 +62,7 @@ once its publish succeeded, so a dark mesh delays reports and loses none. Item
 ids already reported are remembered in a bounded in-memory window (4000 by
 default), rebuilt on restart.
 
-It offers no procedure and asks the realm for no extra authority. `/health` is
+It offers no procedure of its own and asks the realm for no extra authority. `/health` is
 green while the sensor runs; a source that is down, or a dark mesh, is not a
 health failure.
 
@@ -117,7 +117,7 @@ published, so a host can be pinned back to a known one to roll back. A push that
 changes only documentation builds no image (`scripts/is_image_push.sh`).
 
 The service's org is this repository's name, fixed in `config/sys.config.src`,
-and it is the org segment of the fact topic. The sensor offers no procedure, so
+and it is the org segment of the fact topic. The sensor offers no procedure of its own, so
 nothing is advertised under it.
 
 Two things CI cannot do for you, both of which have bitten:

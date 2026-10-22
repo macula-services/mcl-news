@@ -5,7 +5,7 @@ without reading it.*
 
 **Status: built and published, one sensor, no store.** The dev fleet follows
 `:latest`, which only a signed `v*` tag moves. The sensor polls its sources every five
-minutes, reports each item it has not reported before as one fact, offers no procedure
+minutes, reports each item it has not reported before as one fact, offers no procedure of its own
 and keeps no store.
 
 ## Level 1: system context
@@ -14,14 +14,14 @@ and keeps no store.
 
 | Element | Kind | Role |
 | --- | --- | --- |
-| mcl-news | In scope | Polls every source every five minutes and reports each new item as `news_item_reported_v1` on `<realm>/mcl-news/news/wire/`. `/health` is a port, 8498. No procedures and no store |
+| mcl-news | In scope | Polls every source every five minutes and reports each new item as `news_item_reported_v1` on `<realm>/mcl-news/news/wire/`. `/health` is a port, 8498. No procedures of its own and no store |
 | Operator | Person | Runs it and sets `MCL_NEWS_FEEDS`, or leaves the built-in broadcaster list in place |
 | Consumer | External system | A mind or an agent subscribed to `news_item_reported_v1`. The payload names no sender |
 | News sources | External system | France 24, VRT NWS and DW by default: RSS/Atom over HTTPS with the system CA store, plus the article page for `og:image` |
 | macula-realm | Macula infrastructure | The trust anchor and the grant: the org `mcl-news`, scope for 30 days, and the boot claim its operator sees |
 | Macula stations, mesh DHT | Macula infrastructure | The pinned dial. The fact goes out through a station, and the DHT holds each advertisement |
 
-The sensor offers no procedure and asks the realm for no extra authority: its whole
+The sensor offers no procedure of its own and asks the realm for no extra authority: its whole
 output is one fact, published under its own verified identity. A source's first fetch
 seeds rather than floods: only its newest item is reported and the rest of the backlog
 is marked seen. A source being down, or a dark mesh, is deliberately not a health

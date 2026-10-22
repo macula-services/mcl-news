@@ -140,9 +140,9 @@ def context():
           ["A mind or an agent subscribed", "to news_item_reported_v1; the", "payload names no sender"])
     d.box("b-ext", 690, 30, 270, 120, "News sources", "[External system]",
           ["France 24, VRT NWS and DW by", "default: RSS/Atom over HTTPS,", "and the page for og:image"])
-    d.box("b-sys", 365, 186, 270, 152, "mcl-news", "[mcl_om mesh service]",
+    d.box("b-sys", 365, 186, 270, 170, "mcl-news", "[mcl_om mesh service]",
           ["Polls every source every five", "minutes and reports each item it", "has not reported before as one fact,",
-           "news_item_reported_v1. /health is a", "port, 8498. No procedures, no store"])
+           "news_item_reported_v1. /health is a", "port, 8498. No own procedures, and", "no store"])
     d.box("b-mac", 365, 430, 270, 120, "macula-realm", "[Macula infrastructure]",
           ["The trust anchor and the grant:", "the org mcl-news, scope for 30", "days, and the boot claim"])
     d.box("b-mac", 690, 430, 270, 120, "Macula stations, mesh DHT", "[Macula infrastructure]",
@@ -153,7 +153,7 @@ def context():
     d.edge("M600 186V168H825V150"); d.text("t-rel", 640, 164, "fetches every 5 minutes")
     d.edge("M460 338V430"); d.text("t-rel", 468, 384, "trust anchor, grant")
     d.edge("M620 338V370H825V430"); d.text("t-rel", 632, 364, "publishes the fact")
-    d.text("t-desc", 40, 596, "The sensor offers no procedure and asks the realm for no extra authority: its whole output is one fact, published under")
+    d.text("t-desc", 40, 596, "The sensor offers no procedure of its own and asks the realm for no extra authority: its whole output is one fact, published under")
     d.text("t-desc", 40, 614, "its own verified identity. A source's first fetch seeds rather than floods: only its newest item is reported and the")
     d.text("t-desc", 40, 632, "rest of the backlog is marked seen. A source being down, or a dark mesh, is deliberately not a health failure.")
     d.legend(650, boundary=False)
