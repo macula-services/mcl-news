@@ -34,8 +34,9 @@ services:
       # the service looks healthy.
       - secrets:/etc/mcl/secrets
     labels:
-      # Kept for a host that opts into watchtower itself; which image runs is
-      # decided outside this file. Harmless otherwise.
+      # No watchtower runs on the fleet; a host that opts into watchtower
+      # itself keeps this label, and which image runs is decided outside this
+      # file. Harmless otherwise.
       - "com.centurylinklabs.watchtower.enable=true"
     environment:
       # No default. A service that guesses its realm announces itself where

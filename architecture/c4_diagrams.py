@@ -168,9 +168,9 @@ def components():
            "so mcl_om starts no reckon-db and no subscription."], code=True)
     d.box("b-sys", 536, 70, 456, 152, "mcl_news_service", "[:mcl_om_service behaviour]",
           ["The six callbacks. start/1 refuses a realm whose", "tag is not the sha256 of MCL_REALM_NAME, and its",
-           "scope is mcl-news for 30 days. No procedure of its",
-           "own; mcl-om adds mcl-news/info and",
-           "mcl-news/get_limits, both open. capabilities/0 is the list."], code=True)
+           "scope is mcl-news for 30 days. No procedure of its own;",
+           "mcl-om adds mcl-news/info and mcl-news/get_limits,",
+           "both open. capabilities/0 is the list."], code=True)
     d.box("b-cmp", 56, 230, 456, 120, "mcl_news_sup", "[supervisor, one_for_one]",
           ["One child, sense_news_feeds, which owns the poll", "loop, the dedupe window and the publishing.",
            "A crashed sensor is restarted and re-seeds."], code=True)

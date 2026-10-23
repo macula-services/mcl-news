@@ -77,7 +77,7 @@ item(Node) ->
 %% control of it -- they can change it, pull it, or refuse it.
 %%
 %% Three shapes, all seen in the live EU feeds this sensor polls (surveyed
-%% 2026-09-02, 16 of 31 sources carry one):
+%% 2026-09-02, 16 of the 31 sources carry one):
 %%
 %%   guardian  <media:content width="140|460|700" url="....jpg?width=140">
 %%   err       <media:thumbnail url='....jpg' height='75' width='75'/>

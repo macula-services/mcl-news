@@ -58,9 +58,9 @@
 <text class="t-type" x="552" y="116">[:mcl_om_service behaviour]</text>
 <text class="t-desc" x="552" y="140">The six callbacks. start/1 refuses a realm whose</text>
 <text class="t-desc" x="552" y="156">tag is not the sha256 of MCL_REALM_NAME, and its</text>
-<text class="t-desc" x="552" y="172">scope is mcl-news for 30 days. No procedure of its</text>
-<text class="t-desc" x="552" y="188">own; mcl-om adds mcl-news/info and</text>
-<text class="t-desc" x="552" y="204">mcl-news/get_limits, both open. capabilities/0 is the list.</text>
+<text class="t-desc" x="552" y="172">scope is mcl-news for 30 days. No procedure of its own;</text>
+<text class="t-desc" x="552" y="188">mcl-om adds mcl-news/info and mcl-news/get_limits,</text>
+<text class="t-desc" x="552" y="204">both open. capabilities/0 is the list.</text>
 <rect class="b-cmp" x="56" y="230" width="456" height="120" rx="10"/>
 <text class="t-code" x="72" y="258">mcl_news_sup</text>
 <text class="t-type" x="72" y="276">[supervisor, one_for_one]</text>

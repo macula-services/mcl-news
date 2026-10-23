@@ -34,7 +34,8 @@ stop(_State) -> ok.
 %% until it returns), both deliberately.
 health() -> ok.
 
-%% A sensor offers no procedure: it reports facts, and consumers subscribe.
+%% A sensor offers no procedure of its own: it reports facts, and consumers
+%% subscribe.
 capabilities() -> [].
 
 %% THE AUTHORITY THIS SERVICE ASKS THE REALM FOR, and deliberately nothing more.

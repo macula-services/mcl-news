@@ -21,11 +21,12 @@
         %% shell and expecting that to be enough has cost a sibling service an
         %% hour, because nothing translates between the two by itself.
         {realm,             <<"${MCL_REALM}">>},
-        %% ONE ORG PER SERVICE, NAMED AFTER THE REPOSITORY: the `Org' in every
-        %% procedure it offers (`Org/Name'), and the org the realm's grant
+        %% ONE ORG PER SERVICE, NAMED AFTER THE REPOSITORY: the `Org' in all
+        %% of its own procedures (`Org/Name'), and the org the realm's grant
         %% names. Fixed here rather than read from the environment, because it
         %% is a property of the service, not of where it runs. Without it
-        %% mcl_om answers `_' and advertises nothing.
+        %% mcl_om refuses to boot, naming the setting, rather than running
+        %% green and advertising nothing.
         {org,               <<"mcl-news">>},
         %% ⚠ THE TRUST ANCHOR, AND IT IS NOT OPTIONAL. MCL_REALM above is an
         %% IDENTIFIER (sha256 of the realm name); this is the realm's public
@@ -46,8 +47,8 @@
         %% An earlier version of this file said the realm's key comes from a
         %% `foundation_realm_trust_list' DHT record rather than from here.
         %% That is WRONG for this path and cost a deployment: `macula_direct_dial'
-        %% never supplies the foundation form, so the pinned key is the only
-        %% way an advertisement is ever trusted.
+        %% never supplies the foundation form, so an advertisement is trusted
+        %% only when the pinned key verifies it.
         {realm_key,         <<"${MCL_REALM_KEY}">>}
     ]},
     %% ==========================================================================

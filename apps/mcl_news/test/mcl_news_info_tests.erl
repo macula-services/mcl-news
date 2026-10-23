@@ -1,8 +1,10 @@
-%% @doc `mcl-news/info', the procedure mcl_om answers for this service with
-%% no code of its own: who it is, its versions and what it advertises.
+%% @doc `mcl-news/info' and `mcl-news/get_limits', the procedures mcl_om answers
+%% for this service with no code of its own: `info' reports who it is, its
+%% versions and what it advertises, and `get_limits' reports the limits.
 %%
 %% Built from this service's real info/0 and its real capabilities/0 with
-%% `info' added the way mcl_om:boot/2 adds it, then sent through macula's own
+%% `info' added the way mcl_om:boot/2 adds it (`get_limits' is added at boot
+%% too, and this path does not exercise it), then sent through macula's own
 %% frame codec, the path a reply takes. What arrives must be text, never bytes,
 %% and name this service, its procedures and the mcl_om 1.4 / macula 16.0 pair
 %% it was built with: 16 keeps wire 1.0, the wire the flag day moved every

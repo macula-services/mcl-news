@@ -109,12 +109,16 @@ what stops a config table in a README and the real environment drifting.
 ## Deployment
 
 The image has two channels. A `v*` tag publishes its own version and then, once
-`attest` has signed and attested that digest, points `:latest` at it; the fleet
-runs a signed release pinned by digest, and CI commits that pin. A push to `main`
-publishes `:main` and `:<sha>`, the tip for trying, and nothing follows those, so
-a merge deploys nothing. The semver tags stay published, so a host can be pinned
-back to a known one to roll back. A push that changes only documentation builds
-no image (`scripts/is_image_push.sh`).
+`attest` has signed and attested that digest, points `:latest` at it, which no
+box follows: macula-fleet instead pins a `<version>@sha256:<digest>` from its own
+release workflow, canary first. For mcl-news the pin lives in a reviewed
+macula-fleet commit: `edge/gitops/release-targets:88` names
+`edge/scripts/docker-compose.mcl-news.yml` as the canary file, and its line 39
+carries `0.2.0@sha256:<digest>`. A push to `main` publishes `:main` and `:<sha>`,
+the tip for trying, and nothing follows those, so a merge deploys nothing. The
+semver tags stay published, so a host can be pinned back to a known one to roll
+back. A push that changes only documentation builds no image
+(`scripts/is_image_push.sh`).
 
 The service's org is this repository's name, fixed in `config/sys.config.src`,
 and it is the org segment of the fact topic. `mcl-news` has no procedure of its
@@ -127,8 +131,9 @@ Two things CI cannot do for you, both of which have bitten:
    the host with a bare `unauthorized` that names nothing. Check it after the
    first build. On ghcr the `org.opencontainers.image.source` label in the
    Containerfile is what links the package to the repository.
-2. The host needs `MCL_REALM`, `MCL_REALM_NAME`, `MCL_REALM_KEY` and the pinned
-   station pair supplied from somewhere they are not committed.
+2. The host needs `MCL_REALM`, `MCL_REALM_NAME`, `MCL_REALM_KEY` and the
+   addresses of the stations it dials supplied from somewhere they are not
+   committed.
 
 ## The service contract
 
@@ -152,6 +157,12 @@ node.** Export `store_id/0` and `data_dir/0`; add the `evoq` adapter block to
 `{not_configured, event_store_adapter}` before any service code runs; and mount a
 volume in the compose file. A sibling service put two of three fleet nodes into a
 boot loop by doing the first and not the second.
+
+## Architecture
+
+The C4 model — system context, containers and components — is in
+[architecture/README.md](architecture/README.md), with the diagram sources in
+`architecture/c4_diagrams.py` and the rendered SVGs in `assets/`.
 
 ## Licence
 

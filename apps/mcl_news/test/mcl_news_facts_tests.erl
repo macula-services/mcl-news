@@ -1,4 +1,4 @@
-%%% @doc The public contract: the one fact topic, and the fact itself. Pure:
+%%% @doc The public contract: its one fact topic, and the fact itself. Pure:
 %%% no network, no mesh (the publish is integration).
 -module(mcl_news_facts_tests).
 

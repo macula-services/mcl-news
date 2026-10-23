@@ -58,9 +58,10 @@ info_version_matches_the_application_test() ->
 health_is_green_test() ->
     ?assertEqual(ok, ?SERVICE:health()).
 
-%% A sensor offers no procedure: it reports facts, and a consumer subscribes to
-%% them. An empty list is the honest answer, and adding a capability breaks
-%% this test so someone writes down what the service can now be called for.
+%% A sensor offers no procedure of its own: it reports facts, and a consumer
+%% subscribes to them. An empty list is the honest answer, and adding a
+%% capability breaks this test so someone writes down what the service can now
+%% be called for.
 announces_no_capability_test() ->
     ?assertEqual([], ?SERVICE:capabilities()).
 
