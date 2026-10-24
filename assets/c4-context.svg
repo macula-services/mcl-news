@@ -92,9 +92,9 @@
 <text class="t-rel" x="552" y="172" text-anchor="end">one fact per new item</text>
 <path class="edge" d="M600 186V168H825V150" marker-end="url(#a)"/>
 <text class="t-rel" x="640" y="164">fetches every 5 minutes</text>
-<path class="edge" d="M460 338V430" marker-end="url(#a)"/>
+<path class="edge" d="M460 356V430" marker-end="url(#a)"/>
 <text class="t-rel" x="468" y="384">trust anchor, grant</text>
-<path class="edge" d="M620 338V370H825V430" marker-end="url(#a)"/>
+<path class="edge" d="M620 356V370H825V430" marker-end="url(#a)"/>
 <text class="t-rel" x="632" y="364">publishes the fact</text>
 <text class="t-desc" x="40" y="596">The sensor asks the realm for no extra authority: its whole output is one fact, published under its own verified identity.</text>
 <text class="t-desc" x="40" y="614">A source's first fetch seeds rather than floods: only its newest item is reported, and the</text>
