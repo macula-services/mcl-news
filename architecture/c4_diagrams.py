@@ -148,7 +148,7 @@ def context():
     d.box("b-mac", 690, 430, 270, 120, "Macula stations, mesh DHT", "[Macula infrastructure]",
           ["The pinned dial; the fact goes out", "through a station, and the DHT", "holds each advertisement"])
     d.edge("M175 150V168H400V186")
-    d.text("t-rel", 183, 160, "deploys it, sets"); d.text("t-rel", 183, 176, "the feed list")
+    d.text("t-rel", 183, 184, "deploys it, sets"); d.text("t-rel", 183, 200, "the feed list")
     d.edge("M560 186V150"); d.text("t-rel", 552, 172, "one fact per new item", anchor="end")
     d.edge("M600 186V168H825V150"); d.text("t-rel", 640, 164, "fetches every 5 minutes")
     d.edge("M460 356V430"); d.text("t-rel", 468, 384, "trust anchor, grant")

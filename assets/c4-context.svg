@@ -86,8 +86,8 @@
 <text class="t-desc" x="706" y="516">through a station, and the DHT</text>
 <text class="t-desc" x="706" y="532">holds each advertisement</text>
 <path class="edge" d="M175 150V168H400V186" marker-end="url(#a)"/>
-<text class="t-rel" x="183" y="160">deploys it, sets</text>
-<text class="t-rel" x="183" y="176">the feed list</text>
+<text class="t-rel" x="183" y="184">deploys it, sets</text>
+<text class="t-rel" x="183" y="200">the feed list</text>
 <path class="edge" d="M560 186V150" marker-end="url(#a)"/>
 <text class="t-rel" x="552" y="172" text-anchor="end">one fact per new item</text>
 <path class="edge" d="M600 186V168H825V150" marker-end="url(#a)"/>
