@@ -7,8 +7,10 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## 0.3.0 - 2026-10-30
 
-- **The base library is macula 18** (macula-io/macula#147, mcl-om#41): the macula
-  floor moves `~> 16.0` to `~> 18.0` and `mcl_om` `~> 1.4` to `~> 1.6`. 18 keeps
+- **The base library is macula 18** (macula-io/macula#147, mcl-om#41). An
+  operator on 0.2.0 (mcl_om 1.0, macula 15.6) moves to `mcl_om ~> 1.6` and
+  `macula ~> 18.0` here: 0.3.0 is the first release to carry the macula 16 floor
+  as well, which sat Unreleased, and this entry moves on from it. 18 keeps
   wire 1.0, so this service still speaks to every wire 1.0 box; what it adds is
   the caller class a handler-bearing capability must name and the source rule a
   subscription must name, both of which mcl_om 1.6 refuses the boot over. This

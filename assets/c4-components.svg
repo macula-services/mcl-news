@@ -99,13 +99,13 @@
 <text class="t-desc" x="552" y="652">bounded and silent on failure. Never for old items.</text>
 <rect class="b-mac" x="56" y="710" width="456" height="120" rx="10"/>
 <text class="t-code" x="72" y="738">mcl_om</text>
-<text class="t-type" x="72" y="756">[library, ~&gt; 1.4]</text>
+<text class="t-type" x="72" y="756">[library, ~&gt; 1.6]</text>
 <text class="t-desc" x="72" y="780">boot/1: loads the identity key, joins the</text>
 <text class="t-desc" x="72" y="796">realm, dials the pinned stations, serves /health</text>
 <text class="t-desc" x="72" y="812">on 8498, and carries mcl_om_pubsub:publish/3.</text>
 <rect class="b-mac" x="536" y="710" width="456" height="120" rx="10"/>
 <text class="t-code" x="552" y="738">macula SDK</text>
-<text class="t-type" x="552" y="756">[library, ~&gt; 16.0, wire 1.0]</text>
+<text class="t-type" x="552" y="756">[library, ~&gt; 18.0, wire 1.0]</text>
 <text class="t-desc" x="552" y="780">QUIC transport, pubsub over the stations, and</text>
 <text class="t-desc" x="552" y="796">the publisher every link verified, which is</text>
 <text class="t-desc" x="552" y="812">what a fact's attribution rests on.</text>

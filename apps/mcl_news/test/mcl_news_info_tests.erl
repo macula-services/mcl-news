@@ -6,11 +6,11 @@
 %% `info' added the way mcl_om:boot/2 adds it (`get_limits' is added at boot
 %% too, and this path does not exercise it), then sent through macula's own
 %% frame codec, the path a reply takes. What arrives must be text, never bytes,
-%% and name this service, its procedures and the mcl_om 1.4 / macula 16.0 pair
-%% it was built with: 16 keeps wire 1.0, the wire the flag day moved every
+%% and name this service, its procedures and the mcl_om 1.6 / macula 18.0 pair
+%% it was built with: 18 keeps wire 1.0, the wire the flag day moved every
 %% service to. The floors below are rebar.config's floors, so a resolve OLDER
 %% than the declared line fails here. They do not hold the wire: forward drift
-%% onto macula 17 passes these floors, and what refuses that is the `~> 16.0'
+%% onto macula 19 passes these floors, and what refuses that is the `~> 18.0'
 %% constraint, at resolve time.
 -module(mcl_news_info_tests).
 
@@ -31,8 +31,8 @@ info_round_trip_test_() ->
           ?_assertEqual([{text, C} || C <- [<<(?ORG)/binary, "/info">> | Own]],
                         maps:get(capabilities, Reply)),
           ?_assertEqual([], [V || V <- lists:flatten(maps:values(Reply)), is_binary(V)]),
-          %% Floors, not exact minors: the pairing that matters is mcl_om 1.4 or
-          %% later WITH macula 16.0 or later; a later compatible release must
+          %% Floors, not exact minors: the pairing that matters is mcl_om 1.6 or
+          %% later WITH macula 18.0 or later; a later compatible release must
           %% not fail this.
           ?_assert(at_least(maps:get(mcl_om_version, Reply), [1, 6])),
           ?_assert(at_least(maps:get(macula_version, Reply), [18, 0]))]

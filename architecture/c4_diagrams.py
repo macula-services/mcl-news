@@ -189,10 +189,10 @@ def components():
     d.box("b-cmp", 536, 550, 456, 120, "og_image", "[Erlang module, one network step]",
           ["For an item with no picture, reads the", "publisher's own og:image from the article page,",
            "bounded and silent on failure. Never for old items."], code=True)
-    d.box("b-mac", 56, 710, 456, 120, "mcl_om", "[library, ~> 1.4]",
+    d.box("b-mac", 56, 710, 456, 120, "mcl_om", "[library, ~> 1.6]",
           ["boot/1: loads the identity key, joins the", "realm, dials the pinned stations, serves /health",
            "on 8498, and carries mcl_om_pubsub:publish/3."], code=True)
-    d.box("b-mac", 536, 710, 456, 120, "macula SDK", "[library, ~> 16.0, wire 1.0]",
+    d.box("b-mac", 536, 710, 456, 120, "macula SDK", "[library, ~> 18.0, wire 1.0]",
           ["QUIC transport, pubsub over the stations, and", "the publisher every link verified, which is",
            "what a fact's attribution rests on."], code=True)
     d.edge("M56 130H16V770H56"); d.text("t-rel", 30, 450, "calls mcl_om:boot/1", anchor="middle", rotate=-90)

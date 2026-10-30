@@ -42,8 +42,8 @@ failure.
 | `parse_feed` | Erlang module, pure | One xpath sweep for RSS 2.0, RSS 1.0/RDF and Atom. The item id is a sha256 of the source's own guid, so the same story dedupes across polls |
 | `enrich_item` | Erlang module, pure | Topic class and emoji, reporting and subject country, source type: a fixed taxonomy plus a gazetteer sweep, with a safe default for every field |
 | `og_image` | Erlang module, one network step | For an item with no picture, reads the publisher's own `og:image` from the article page. Bounded, and silent on failure. Never for an item already reported |
-| `mcl_om` | library, `~> 1.4` | `boot/1`: loads the identity key, joins the realm, dials the pinned stations, serves `/health` on 8498. Carries `mcl_om_pubsub:publish/3`, which the fact goes through |
-| macula SDK | library, `~> 16.0`, wire 1.0 | QUIC transport, pubsub over the stations, and the verified publisher every fact's attribution rests on |
+| `mcl_om` | library, `~> 1.6` | `boot/1`: loads the identity key, joins the realm, dials the pinned stations, serves `/health` on 8498. Carries `mcl_om_pubsub:publish/3`, which the fact goes through |
+| macula SDK | library, `~> 18.0`, wire 1.0 | QUIC transport, pubsub over the stations, and the verified publisher every fact's attribution rests on |
 | Host environment | read at boot | `MCL_REALM`, `MCL_REALM_NAME`, `MCL_REALM_KEY`, `MACULA_STATION_SEEDS`, `MACULA_STATION_NODE_IDS`, `MCL_NEWS_FEEDS`, `MCL_NEWS_POLL_MS`, `MCL_NEWS_SEED_COUNT`, `MCL_NEWS_MAX_SEEN`, `MCL_SERVICE_NAME`, `MCL_BOX`, `MCL_HEALTH_PORT`, `MCL_NODE_NAME`, `MCL_NODE_HOST`, `MCL_COOKIE` |
 
 There is no store: the only memory is a bounded set of item ids already reported (4000
